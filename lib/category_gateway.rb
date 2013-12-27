@@ -54,7 +54,7 @@ class CategoryGateway
       store[id] = calculate_transitive_articles_for_category(id, store, depth)      
     else
       @slugs.each_id do |id|
-        store[id] = calculate_transitive_articles_for_category(id, store)
+        store[id] = calculate_transitive_articles_for_category(id, store, depth)
       end
     end
   end
@@ -64,7 +64,8 @@ class CategoryGateway
   def calculate_transitive_articles_for_category(id, store, depth)
     return store[id] unless store.nil?(id)
 
-    a = store[id] = store[id].merge(@article_sets[id])
+    a = store[id]
+    a.merge(@article_sets[id])
     @child_category_sets[id].each do |category_id|
       a.merge(calculate_transitive_articles_for_category(category_id, store, depth-1))
     end if depth > 0

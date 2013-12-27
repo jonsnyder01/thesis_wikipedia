@@ -38,7 +38,7 @@ describe TupleLogger do
     it "logs a tuple" do
       @logger.log(prototype_a, tuple_a)
       @logger.close
-      @log.string.should == "#{prototype_a.to_s}: 1\n#{tuple_a.to_s}\n"
+      @log.string.should == "#{prototype_a.to_s}: 1\n#{tuple_a.to_s}\n\n"
     end
 
     it "should only log 5 tuples" do
@@ -57,11 +57,11 @@ describe TupleLogger do
       @logger.log(prototype_b, tuple_b)
       @logger.close
       lines = @log.string.split("\n")
-      lines.length.should == 4
+      lines.length.should == 5 # 4 tuples and an extra newline
       lines[0].should == "#{prototype_a.to_s}: 1"
       lines[1].should == "#{tuple_a.to_s}"
-      lines[2].should == "#{prototype_b.to_s}: 1"
-      lines[3].should == "#{tuple_b.to_s}"
+      lines[3].should == "#{prototype_b.to_s}: 1"
+      lines[4].should == "#{tuple_b.to_s}"
     end
   end
   

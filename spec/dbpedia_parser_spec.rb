@@ -8,8 +8,9 @@ describe DbpediaParser do
 
   let(:log) { StringIO.new }
   let(:logger) { TupleLogger.new(log,5) }
+  let(:status_log) { StringIO.new }
   let(:tokenizer) { DbpediaTokenizer.new(input) }
-  let(:parser) { DbpediaParser.new(tokenizer, logger) }
+  let(:parser) { DbpediaParser.new(tokenizer, logger, status_log) }
   let(:log_output) do
     log.string
   end
@@ -35,7 +36,7 @@ describe DbpediaParser do
       let(:input) { ["<a> <b> <c>"] }
       let(:pattern) { [Token, Token::Url.new("a"), Token] }
       it { matches.length.should == 0 }
-      it { log_output.should == "#{[Token,nil,Token].to_s}: 1\n#{[Token::Url.new('a'),Token::Url.new('b'),Token::Url.new('c')].to_s}\n" }
+      it { log_output.should == "#{[Token,nil,Token].to_s}: 1\n#{[Token::Url.new('a'),Token::Url.new('b'),Token::Url.new('c')].to_s}\n\n" }
     end
   end
   context "with exception" do
@@ -48,6 +49,6 @@ describe DbpediaParser do
       end
     end
 
-    it { log_output.should == "Foo: 1\n#{[Token::Url.new('a'),Token::Url.new('a'),Token::Url.new('a')].to_s}\n" }
+    it { log_output.should == "Foo: 1\n#{[Token::Url.new('a'),Token::Url.new('a'),Token::Url.new('a')].to_s}\n\n" }
   end
 end
