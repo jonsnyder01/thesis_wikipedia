@@ -1,3 +1,5 @@
+require 'not_found'
+
 class SlugStore
 
   def initialize(marshal_helper, location)

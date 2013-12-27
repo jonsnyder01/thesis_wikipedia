@@ -1,8 +1,3 @@
-require 'not_found'
-require 'slug_store'
-require 'string_store'
-require 'set_store'
-
 class CategoryGateway
 
   class Category

@@ -1,8 +1,3 @@
-require 'json'
-require 'not_found'
-require 'slug_store'
-require 'object_store'
-
 class ArticleGateway
 
   class Article

@@ -1,4 +1,4 @@
-
+require 'json'
 
 class FixedArticleGateway
 
