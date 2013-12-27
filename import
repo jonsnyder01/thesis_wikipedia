@@ -1,0 +1,8 @@
+
+bzcat long_abstracts_en.ttl.bz2 | ./app import long_abstracts db/full
+bzcat labels_en.ttl.bz2 | ./app import article_titles db/full
+bzcat redirects_transitive_en.ttl.bz2 | ./app import redirects_transitive db/full
+bzcat category_labels_en.ttl.bz2 | ./app import category_labels db/full
+bzcat article_categories_en.ttl.bz2 | ./app import article_categories db/full
+bzcat article_categories_en.ttl.bz2 | ./app import article_categories db/full
+bzcat skos_categories_en.ttl.bz2 | ./app import skos_categories db/full
