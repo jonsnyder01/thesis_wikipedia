@@ -1,4 +1,4 @@
-class FixedCategoryGateway
+class SimpleCategoryGateway
 
   class Category
     def initialize(id,titles,article_sets)

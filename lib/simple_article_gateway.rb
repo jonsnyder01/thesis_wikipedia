@@ -1,6 +1,6 @@
 require 'json'
 
-class FixedArticleGateway
+class SimpleArticleGateway
 
   def initialize(titles,texts)
     @size = [titles.size,texts.size].min

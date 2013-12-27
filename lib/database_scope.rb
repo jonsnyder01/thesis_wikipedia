@@ -1,8 +1,8 @@
 
 require 'article_gateway'
-require 'fixed_article_gateway'
+require 'simple_article_gateway'
 require 'category_gateway'
-require 'fixed_category_gateway'
+require 'simple_category_gateway'
 require 'slug_store'
 require 'object_store'
 require 'set'
@@ -17,12 +17,12 @@ class DatabaseScope
     ArticleGateway.new(article_slugs,article_titles,article_texts)
   end
 
-  def fixed_article_gateway
-    FixedArticleGateway.new(article_titles,article_texts)
+  def simple_article_gateway
+    SimpleArticleGateway.new(article_titles,article_texts)
   end
 
-  def logging_fixed_article_gateway
-    FixedArticleGateway.new(logging_article_titles,article_texts)
+  def logging_simple_article_gateway
+    SimpleArticleGateway.new(logging_article_titles,article_texts)
   end
 
   def article_slugs
@@ -45,12 +45,12 @@ class DatabaseScope
     CategoryGateway.new(category_slugs,category_titles,category_article_sets,category_child_category_sets)
   end
 
-  def fixed_category_gateway
-    FixedCategoryGateway.new(category_titles,category_article_sets)
+  def simple_category_gateway
+    SimpleCategoryGateway.new(category_titles,category_article_sets)
   end
 
-  def logging_fixed_category_gateway
-    FixedCategoryGateway.new(logging_category_titles,category_article_sets)
+  def logging_simple_category_gateway
+    SimpleCategoryGateway.new(logging_category_titles,category_article_sets)
   end
 
   def category_slugs

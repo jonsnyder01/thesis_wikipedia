@@ -16,10 +16,10 @@ class InputOutputScope
 
   def subset_command
     ScopeCommand.new(
-      input_database.fixed_article_gateway,
-      input_database.fixed_category_gateway,
-      output_database.logging_fixed_article_gateway,
-      output_database.logging_fixed_category_gateway
+      input_database.simple_article_gateway,
+      input_database.simple_category_gateway,
+      output_database.logging_simple_article_gateway,
+      output_database.logging_simple_category_gateway
       )
   end
 

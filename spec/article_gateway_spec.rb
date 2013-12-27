@@ -9,7 +9,7 @@ describe ArticleGateway do
   let(:marshal_helper) { InMemoryMarshalHelper.new }
   let(:database_scope) { DatabaseScope.new(marshal_helper) }
   let(:gateway) { database_scope.article_gateway }
-  let(:fixed_gateway) { database_scope.fixed_article_gateway }
+  let(:simple_gateway) { database_scope.simple_article_gateway }
 
   describe "#create" do
     it "should return nil and not raise error" do
@@ -41,7 +41,7 @@ describe ArticleGateway do
   
     def as_json
       file = StringIO.new
-      fixed_gateway.write_pipeline_file(file)
+      simple_gateway.write_pipeline_file(file)
       file.string.split("\n").map do |line|
         JSON.parse(line)
       end
