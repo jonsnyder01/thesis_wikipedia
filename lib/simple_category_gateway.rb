@@ -17,7 +17,7 @@ class SimpleCategoryGateway
   end
 
   def [](id)
-    Category.new(titles[id],articles[id])
+    Category.new(id, @titles, @article_sets)
   end
 
   def initialize(titles, article_sets)
@@ -36,15 +36,24 @@ class SimpleCategoryGateway
     article_id_map = Hash[@article_sets[id].each_with_index.to_a]
     
     (0..@size-1).each do |old_category_id|
-      article_ids = (@article_sets[id] & @article_sets[category_id]).map do |old_article_id|
-        article_id_map[old_artile_id]
+      article_ids = (@article_sets[id] & @article_sets[old_category_id]).map do |old_article_id|
+        article_id_map[old_article_id]
       end
-      if new_article_set.size >= minimum_category_size
+      if article_ids.size >= minimum_category_size
         other.create(
           title: @titles[old_category_id],
           article_set: Set.new(article_ids)
           )
       end
+    end
+  end
+
+  def write_pipeline_file(file)
+    (0..@size-1).each do |id|
+      title = @titles[id]
+      article_set = @article_sets[id]
+      next unless title && article_set
+      file.puts JSON.dump({id: id, title: title, articles: article_set.to_a})
     end
   end
 

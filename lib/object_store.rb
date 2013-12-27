@@ -29,13 +29,6 @@ class ObjectStore
   def size
     objects_by_id.size
   end
-
-  def build_subset(subset_object_store, new_ids_by_old_id)
-    new_ids_by_old_id.each do |old_id, new_id|
-      next if self.nil?(old_id)
-      subset_object_store[new_id] = self[old_id].dup
-    end
-  end
   
   def flush
     if @is_dirty
