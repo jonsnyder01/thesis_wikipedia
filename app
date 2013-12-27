@@ -20,7 +20,7 @@ when "import"
   db.category_article_sets.flush
   db.category_child_category_sets.flush
 when "calculate_transitive"
-  require 'calculate_transitive_scope'
+  require 'input_output_scope'
   input_directory = ARGV.shift
   output_directory = ARGV.shift
   category_slug = ARGV.shift
@@ -29,7 +29,7 @@ when "calculate_transitive"
   scope.calculate_transitive_command.run(category_slug)
   scope.store.flush
 when "subset"
-  require 'subset_scope'
+  require 'input_output_scope'
   input_directory = ARGV.shift
   output_directory = ARGV.shift
   category_slug = ARGV.shift
