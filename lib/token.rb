@@ -45,9 +45,15 @@ class Token
   end
   
   class Resource < Url
+    def to_s
+      @value
+    end
   end
   
   class Category < Resource
+    def to_s
+      @value
+    end
   end
   
   class Ontology < Url
@@ -59,6 +65,9 @@ class Token
   class String < Token
     def initialize(value)
       super(value.gsub('\"','"'))
+    end
+    def to_s
+      @value
     end
   end
   

@@ -54,6 +54,18 @@ when "subset"
   scope.output_database.article_texts.flush
   scope.output_database.category_titles.flush
   scope.output_database.category_article_sets.flush
+when "json"
+  require 'marshal_helper'
+  require 'database_scope'
+  input_directory = ARGV.shift
+  input = MarshalHelper.new(input_directory)
+  db = DatabaseScope.new(input)
+  input.write('articles.json') do |file|
+    db.simple_article_gateway.write_pipeline_file(file)
+  end
+  input.write('categories.json') do |file|
+    db.simple_category_gateway.write_pipeline_file(file)
+  end
 else
   STDERR.puts "Unknown command #{command}"
 end

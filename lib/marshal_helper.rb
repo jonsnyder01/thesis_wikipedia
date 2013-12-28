@@ -33,6 +33,13 @@ class MarshalHelper
     File.symlink(File.absolute_path(filename(name)),to_filename)
   end
 
+  def write(name)
+    ensure_directory
+    File.open(filename(name),'w') do |file|
+      yield file
+    end
+  end
+
   protected
   
   def filename(name)

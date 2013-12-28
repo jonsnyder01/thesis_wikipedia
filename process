@@ -1,0 +1,7 @@
+#!/bin/sh
+
+./app calculate_transitive db/full db/small_cs Computer_science 3
+./app link db/full db/small_cs
+./app subset db/small_cs db/subset_small_cs Computer_science
+./app json db/subset_small_cs
+
