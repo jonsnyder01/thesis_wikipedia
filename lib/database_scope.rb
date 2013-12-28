@@ -14,15 +14,15 @@ class DatabaseScope
   end
 
   def article_gateway
-    ArticleGateway.new(article_slugs,article_titles,article_texts)
+    @article_gateway ||= ArticleGateway.new(article_slugs,article_titles,article_texts)
   end
 
   def simple_article_gateway
-    SimpleArticleGateway.new(article_titles,article_texts)
+    @simple_article_gateway ||= SimpleArticleGateway.new(article_titles,article_texts)
   end
 
   def logging_simple_article_gateway
-    SimpleArticleGateway.new(logging_article_titles,article_texts)
+    @logging_simple_article_gateway ||= SimpleArticleGateway.new(logging_article_titles,article_texts)
   end
 
   def article_slugs
@@ -42,15 +42,15 @@ class DatabaseScope
   end
 
   def category_gateway
-    CategoryGateway.new(category_slugs,category_titles,category_article_sets,category_child_category_sets)
+    @category_gateway ||= CategoryGateway.new(category_slugs,category_titles,category_article_sets,category_child_category_sets)
   end
 
   def simple_category_gateway
-    SimpleCategoryGateway.new(category_titles,category_article_sets)
+    @simple_category_gateway ||= SimpleCategoryGateway.new(category_titles,category_article_sets)
   end
 
   def logging_simple_category_gateway
-    SimpleCategoryGateway.new(logging_category_titles,category_article_sets)
+    @logging_simple_category_gateway ||= SimpleCategoryGateway.new(logging_category_titles,category_article_sets)
   end
 
   def category_slugs

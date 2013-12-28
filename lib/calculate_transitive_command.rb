@@ -6,7 +6,7 @@ class CalculateTransitiveCommand
     @store = store
   end
 
-  def run(category_slug=nil)
-    @category_gateway.calculate_transitive_articles(@store, category_slug)
+  def run(category_slug=nil, depth)
+    @category_gateway.calculate_transitive_articles(@store, category_slug, depth)
   end
 end

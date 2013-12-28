@@ -57,6 +57,7 @@ class CategoryGateway
   private
 
   def calculate_transitive_articles_for_category(id, store, depth)
+    STDERR.puts "  " * (10 - depth) + @titles[id].value + (store.nil?(id) ? "" : " (cached)" )
     return store[id] unless store.nil?(id)
 
     a = store[id]
@@ -64,7 +65,7 @@ class CategoryGateway
     @child_category_sets[id].each do |category_id|
       a.merge(calculate_transitive_articles_for_category(category_id, store, depth-1))
     end if depth > 0
-    a
+    store[id] = a
   end
   
 end

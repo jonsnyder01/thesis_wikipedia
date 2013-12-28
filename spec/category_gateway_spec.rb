@@ -19,9 +19,12 @@ describe CategoryGateway do
   end
 
   def compare_set_store(set_store, expected)
-    set_store.size.should == expected.size
     expected.each_with_index do |e, i|
-      set_store[i].to_a.should =~ e
+      if e.nil?
+        set_store.nil?(i).should be_true
+      else
+        set_store[i].to_a.should =~ e
+      end
     end
   end
   
@@ -91,19 +94,45 @@ describe CategoryGateway do
       gateway.calculate_transitive_articles(t_article_sets)
       compare_set_store(t_article_sets, [[0,1,2],[2],[]])
     end
-    
-    it "handles a loop" do
-      gateway.create(slug: "a", title: "A")
-      gateway.create(slug: "b", title: "B")
-      gateway.create(slug: "c", title: "C")
-      gateway.find_by_slug("a").add_article(article(0))
-      gateway.find_by_slug("a").add_article(article(1))
-      gateway.find_by_slug("b").add_article(article(2))
-      gateway.find_by_slug("a").add_child_category(gateway.find_by_slug("b"))
-      gateway.find_by_slug("b").add_child_category(gateway.find_by_slug("c"))
-      gateway.find_by_slug("c").add_child_category(gateway.find_by_slug("a"))
-      gateway.calculate_transitive_articles(t_article_sets)
-      compare_set_store(t_article_sets, [[0,1,2],[0,1,2],[0,1,2]])
+
+    context "with a loop" do
+
+      before do
+        gateway.create(slug: "a", title: "A")
+        gateway.create(slug: "b", title: "B")
+        gateway.create(slug: "c", title: "C")
+        gateway.find_by_slug("a").add_article(article(0))
+        gateway.find_by_slug("a").add_article(article(1))
+        gateway.find_by_slug("b").add_article(article(2))
+        gateway.find_by_slug("a").add_child_category(gateway.find_by_slug("b"))
+        gateway.find_by_slug("b").add_child_category(gateway.find_by_slug("c"))
+        gateway.find_by_slug("c").add_child_category(gateway.find_by_slug("a"))
+      end
+      
+      it "handles a loop when depth = 4" do
+        gateway.calculate_transitive_articles(t_article_sets, "a", 4)
+        compare_set_store(t_article_sets, [[0,1,2],[0,1,2],[0,1,2]])
+      end
+
+      it "handles a loop with depth = 3" do
+        gateway.calculate_transitive_articles(t_article_sets, "a", 3)
+        compare_set_store(t_article_sets, [[0,1,2],[0,1,2],[0,1]])
+      end
+
+      it "handles a loop with depth = 0" do
+        gateway.calculate_transitive_articles(t_article_sets, "a", 0)
+        compare_set_store(t_article_sets, [[0,1],nil,nil])
+      end
+
+      it "handles a loop with depth = 1" do
+        gateway.calculate_transitive_articles(t_article_sets, "a", 1)
+        compare_set_store(t_article_sets, [[0,1,2],[2],nil])
+      end
+
+      it "works with b" do
+        gateway.calculate_transitive_articles(t_article_sets, "b", 1)
+        compare_set_store(t_article_sets, [nil,[2],[]])
+      end
     end
   end
 =begin  

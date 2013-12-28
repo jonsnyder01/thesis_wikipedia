@@ -1,3 +1,5 @@
+require 'token'
+
 class MarshalHelper
 
   def initialize(directory)
@@ -5,6 +7,7 @@ class MarshalHelper
   end
   
   def dump(obj, name)
+    ensure_directory
     filename = File.join(@directory, name)
     puts "Dumping #{filename.to_s}"
     file = File.open(filename, 'w')
@@ -21,5 +24,22 @@ class MarshalHelper
     obj = Marshal.load(file)
     file.close
     obj
+  end
+
+  def link(name, to)
+    to.ensure_directory
+    to_filename = to.filename(name)
+    File.unlink(to_filename) if File.exists?(to_filename)
+    File.symlink(File.absolute_path(filename(name)),to_filename)
+  end
+
+  protected
+  
+  def filename(name)
+    File.join(@directory, name)
+  end
+
+  def ensure_directory
+    Dir.mkdir(@directory) unless Dir.exist?(@directory)    
   end
 end

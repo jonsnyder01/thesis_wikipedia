@@ -9,9 +9,9 @@ class Token
   def self.create(value)
     case value
     when /^<http:\/\/dbpedia.org\/resource\/Category:(.*)>$/
-      Category.new($1)
+      Category.new($1.downcase)
     when /^<http:\/\/dbpedia.org\/resource\/(.*)>$/
-      Resource.new($1)
+      Resource.new($1.downcase)
     when /^<http:\/\/dbpedia.org\/ontology\/(.*)>$/
       Ontology.new($1)
     when /^<http:\/\/www.w3.org\/2004\/02\/skos\/(.*)>$/

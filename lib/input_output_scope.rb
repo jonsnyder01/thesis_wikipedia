@@ -2,6 +2,7 @@ require 'database_scope'
 require 'marshal_helper'
 require 'logging_object_store'
 require 'calculate_transitive_command'
+require 'subset_command'
 
 class InputOutputScope
 
@@ -15,7 +16,7 @@ class InputOutputScope
   end
 
   def subset_command
-    ScopeCommand.new(
+    SubsetCommand.new(
       input_database.simple_article_gateway,
       input_database.simple_category_gateway,
       output_database.logging_simple_article_gateway,
@@ -24,22 +25,19 @@ class InputOutputScope
   end
 
   def input_database
-    DatabaseScope.new(input_marshal_helper)
+    @input_database ||= DatabaseScope.new(input_marshal_helper)
   end
 
   def input_marshal_helper
-    MarshalHelper.new(@input_directory)
+    @input_marshal_helper ||= MarshalHelper.new(@input_directory)
   end
 
   def output_database
-    DatabaseScope.new(output_marshal_helper)
+    @output_database ||= DatabaseScope.new(output_marshal_helper)
   end
 
   def output_marshal_helper
-    MarshalHelper.new(@output_directory)
+    @output_marshal_helper ||= MarshalHelper.new(@output_directory)
   end
 
-  def store
-    @store ||= output_database.category_article_sets
-  end
 end
