@@ -1,4 +1,5 @@
 require 'token'
+require 'fileutils'
 
 class MarshalHelper
 
@@ -40,12 +41,16 @@ class MarshalHelper
     end
   end
 
-  protected
+  def clear
+    FileUtils.rm_rf(@directory)
+  end
   
   def filename(name)
     File.join(@directory, name)
   end
 
+  protected
+  
   def ensure_directory
     Dir.mkdir(@directory) unless Dir.exist?(@directory)    
   end

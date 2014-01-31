@@ -2,17 +2,54 @@ require 'json'
 
 class SimpleArticleGateway
 
-  def initialize(titles,texts)
+  class Article
+    def initialize(titles, texts, annotations)
+      @titles = titles
+      @texts = texts
+      @annotations = annotations
+    end
+
+    def id=(value)
+      @id = value
+    end
+
+    def id
+      @id
+    end
+
+    def title
+      @titles[@id]
+    end
+
+    def text
+      @texts[@id]
+    end
+
+    def sentence_annotations
+      @annotations[@id]
+    end
+  end
+  
+  def initialize(titles,texts,annotations)
     @size = [titles.size,texts.size].min
     @titles = titles
     @texts = texts
+    @annotations = annotations
   end
 
   def create(title, text)
     @titles << title
     @texts << text
     @size += 1
-  end    
+  end
+
+  def annotate_all(annotator)
+    (0..@texts.size-1).each do |id|
+      next if @texts.nil?(id)
+      annotations = annotator.parse(@texts[id].value)
+      @annotations[id] = annotations
+    end
+  end
   
   def subset(other, article_ids)
     article_ids.each do |id|
@@ -28,5 +65,17 @@ class SimpleArticleGateway
       file.puts JSON.dump({id: id, title: title, text: text})
     end
   end
+
+  def size
+    @size
+  end
+
+  def each
+    article = Article.new(@titles, @texts, @annotations)
+    (0..@size-1).each do |id|
+      article.id = id
+      yield article
+    end
+  end      
   
 end

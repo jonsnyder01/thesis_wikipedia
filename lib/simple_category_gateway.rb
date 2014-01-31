@@ -1,23 +1,26 @@
 class SimpleCategoryGateway
 
   class Category
-    def initialize(id,titles,article_sets)
-      @id = id
+    attr_accessor :id
+
+    def initialize(titles,article_sets)
       @titles = titles
       @article_sets = article_sets
     end
 
     def title
-      @title ||= @titles[@id]
+      @titles[id]
     end
 
     def articles
-      @articles ||= @article_sets[@id]
+      @article_sets[id]
     end
   end
 
   def [](id)
-    Category.new(id, @titles, @article_sets)
+    c = Category.new(@titles, @article_sets)
+    c.id = id
+    c
   end
 
   def initialize(titles, article_sets)
@@ -54,6 +57,14 @@ class SimpleCategoryGateway
       article_set = @article_sets[id]
       next unless title && article_set
       file.puts JSON.dump({id: id, title: title, articles: article_set.to_a})
+    end
+  end
+
+  def each
+    category = Category.new(@titles, @article_sets)
+    (0..@size-1).each do |id|
+      category.id = id
+      yield category
     end
   end
 

@@ -1,4 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'rspec'
-gem 'bitarray'
+gem 'stanford-core-nlp'
+gem 'open4'
+gem 'nokogiri'

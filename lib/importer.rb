@@ -26,19 +26,19 @@ class Importer
 
   def article_titles
     @parser.scan([Token::Resource, Token::Url.new("http://www.w3.org/2000/01/rdf-schema#label"), Token::String]) do |resource, relationship, title|
-      @article_gateway.create(slug: resource.value, title: title)
+      @article_gateway.create(slug: resource.value, title: title.value)
     end
   end
   
   def category_labels
     @parser.scan([Token::Category, Token::Url.new("http://www.w3.org/2000/01/rdf-schema#label"), Token::String]) do |resource, relationship, title|
-      @category_gateway.create(slug: resource.value, title: title)
+      @category_gateway.create(slug: resource.value, title: title.value)
     end
   end
 
   def long_abstracts
     @parser.scan([Token::Resource, Token::Ontology.new("abstract"), Token::String]) do |resource, relationship, abstract|
-      @article_gateway.create(slug: resource.value, text: abstract)
+      @article_gateway.create(slug: resource.value, text: abstract.value)
     end
   end
 

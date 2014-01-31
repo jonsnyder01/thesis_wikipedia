@@ -3,7 +3,6 @@ class ObjectStore
   def initialize(marshal_helper, filename, default_value=nil, &block)
     @marshal_helper = marshal_helper
     @filename = filename
-    @is_dirty = false
     @default_value = default_value
     @default_block = block
   end
@@ -13,7 +12,6 @@ class ObjectStore
   end
 
   def []=(id,value)
-    @is_dirty = true
     objects_by_id[id] = value
   end
 
@@ -22,7 +20,6 @@ class ObjectStore
   end
 
   def <<(value)
-    @is_dirty = true
     objects_by_id << value
   end
   
@@ -31,7 +28,7 @@ class ObjectStore
   end
   
   def flush
-    if @is_dirty
+    if @objects_by_id
       @marshal_helper.dump(@objects_by_id, @filename)
     end
   end

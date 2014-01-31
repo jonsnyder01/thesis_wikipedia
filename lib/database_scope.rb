@@ -3,9 +3,13 @@ require 'article_gateway'
 require 'simple_article_gateway'
 require 'category_gateway'
 require 'simple_category_gateway'
+require 'topic_gateway'
 require 'slug_store'
 require 'object_store'
+require 'logging_object_store'
 require 'set'
+require 'sentence_annotations'
+require 'mallet_topic'
 
 class DatabaseScope
 
@@ -18,11 +22,11 @@ class DatabaseScope
   end
 
   def simple_article_gateway
-    @simple_article_gateway ||= SimpleArticleGateway.new(article_titles,article_texts)
+    @simple_article_gateway ||= SimpleArticleGateway.new(article_titles, article_texts, article_annotations)
   end
 
   def logging_simple_article_gateway
-    @logging_simple_article_gateway ||= SimpleArticleGateway.new(logging_article_titles,article_texts)
+    @logging_simple_article_gateway ||= SimpleArticleGateway.new(logging_article_titles,article_texts,logging_article_annotations)
   end
 
   def article_slugs
@@ -39,6 +43,14 @@ class DatabaseScope
 
   def article_texts
     @article_texts ||= ObjectStore.new(@marshal_helper, 'article_texts')
+  end
+
+  def article_annotations
+    @article_annotations ||= ObjectStore.new(@marshal_helper, 'article_annotations')
+  end
+
+  def logging_article_annotations
+    @logging_article_annotations ||= LoggingObjectStore.new(article_annotations, STDERR, 100)
   end
 
   def category_gateway
@@ -75,6 +87,26 @@ class DatabaseScope
 
   def category_child_category_sets
     @category_child_category_sets ||= ObjectStore.new(@marshal_helper, "category_child_category_sets") { Set.new }
+  end
+
+  def stopwords
+    @stopwords ||= @marshal_helper.load('stopwords')
+  end
+
+  def topic_gateway
+    @topic_gateway ||= TopicGateway.new(topic_mallet_topics, topic_category_vectors, topic_category_similarity_vectors)
+  end
+
+  def topic_mallet_topics
+    @topic_mallet_topics ||= ObjectStore.new(@marshal_helper, 'topic_mallet_topics')
+  end
+
+  def topic_category_vectors
+    @topic_category_vectors ||= ObjectStore.new(@marshal_helper, 'topic_category_vectors')
+  end
+
+  def topic_category_similarity_vectors
+    @topic_category_similarity_vectors ||= ObjectStore.new(@marshal_helper, 'topic_category_similarity_vectors')
   end
 end
 
