@@ -1,0 +1,11 @@
+[01/01/2014 at 09:03AM]
+
+Adding annotator tokenize
+Adding annotator ssplit
+Adding annotator pos
+Loading default properties from tagger /Users/josnyder/school/wikipedia/vendor/stanford-core-nlp-full/taggers/english-left3words-distsim.tagger
+Reading POS tagger model from /Users/josnyder/school/wikipedia/vendor/stanford-core-nlp-full/taggers/english-left3words-distsim.tagger ... done [0.9 sec].
+Jan 1, 2014 1:41:40 PM edu.stanford.nlp.process.PTBLexer next
+WARNING: Untokenizable: ? (U+FFFD, decimal: 65533)
+Jan 1, 2014 5:24:13 PM edu.stanford.nlp.process.PTBLexer next
+WARNING: Untokenizable: ? (U+2061, decimal: 8289)
