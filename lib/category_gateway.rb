@@ -46,7 +46,7 @@ class CategoryGateway
     if category_slug
       id = @slugs.find_id_by_slug(category_slug)
       raise ArgumentError.new("Could not find #{category_slug}") unless id
-      store[id] = calculate_transitive_articles_for_category(id, store, depth)      
+      store[id] = calculate_transitive_articles_for_category(id, store, depth)
     else
       @slugs.each_id do |id|
         store[id] = calculate_transitive_articles_for_category(id, store, depth)
@@ -57,7 +57,7 @@ class CategoryGateway
   private
 
   def calculate_transitive_articles_for_category(id, store, depth)
-    #STDERR.puts "  " * (10 - depth) + (@titles[id] && @titles[id].value || "") + (store.nil?(id) ? "" : " (cached)" )
+    STDERR.puts "  " * (10 - depth) + (@titles[id] || "") + (store.nil?(id) ? "" : " (cached)" )
     return store[id] unless store.nil?(id)
 
     a = store[id]

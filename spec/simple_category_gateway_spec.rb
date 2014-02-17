@@ -6,13 +6,6 @@ require 'database_scope'
 
 describe SimpleCategoryGateway do
 
-  class Box
-    attr_reader :value
-    def initialize(value)
-      @value = value
-    end
-  end
-
   let(:marshal_helper) { InMemoryMarshalHelper.new }
   let(:database_scope) { DatabaseScope.new(marshal_helper) }
   let(:gateway) { database_scope.category_gateway }
@@ -42,10 +35,10 @@ describe SimpleCategoryGateway do
   describe "#subset" do
     it "handles a small test case" do
       
-      gateway.create(slug: "a", title: Box.new("A"))
-      gateway.create(slug: "b", title: Box.new("B"))
-      gateway.create(slug: "c", title: Box.new("C"))
-      gateway.create(slug: "d", title: Box.new("D"))
+      gateway.create(slug: "a", title: "A")
+      gateway.create(slug: "b", title: "B")
+      gateway.create(slug: "c", title: "C")
+      gateway.create(slug: "d", title: "D")
       
       gateway.find_by_slug("a").add_article(article(0))
       gateway.find_by_slug("a").add_article(article(1))

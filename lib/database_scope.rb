@@ -86,6 +86,10 @@ class DatabaseScope
     @logging_category_article_sets ||= LoggingObjectStore.new(category_article_sets, STDERR)
   end
 
+  def logging_transitive_category_article_sets
+    @logging_transitive_category_article_sets ||= LoggingObjectStore.new(transitive_category_article_sets, STDERR)
+  end
+
   def transitive_category_article_sets
     @transitive_category_article_sets ||= ObjectStore.new(@marshal_helper, "transitive_category_article_sets") { SparseVector.new }
   end

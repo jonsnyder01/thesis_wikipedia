@@ -57,7 +57,7 @@ class SimpleCategoryGateway
       title = @titles[id]
       article_set = @article_sets[id]
       next unless title && article_set
-      file.puts JSON.dump({id: id, title: title.value, articles: article_set.to_a})
+      file.puts JSON.dump({id: id, title: title, articles: article_set.to_a})
     end
   end
 

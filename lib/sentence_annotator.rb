@@ -8,6 +8,10 @@ StanfordCoreNLP.log_file = File.join( path, 'log.txt')
 
 class SentenceAnnotator
 
+  def initialize(pipeline=nil)
+    @pipeline_config = pipeline || [:tokenize, :ssplit, :pos]
+  end
+
   def parse(text)
     sentences = []
     pipeline
@@ -33,7 +37,7 @@ class SentenceAnnotator
   private
 
   def pipeline
-    @pipeline ||= StanfordCoreNLP.load(:tokenize, :ssplit, :pos)
+    @pipeline ||= StanfordCoreNLP.load(*@pipeline_config)
   end
   
 end

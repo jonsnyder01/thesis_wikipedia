@@ -1,4 +1,5 @@
 require 'set'
+require 'enumerable'
 
 class RougeMetric
 
@@ -18,8 +19,8 @@ class RougeMetric
 
   def token_set(tokens)
     s = Set.new
-    (0..tokens.size-@n).each do |i|
-      s.add(tokens[i..i+@n-1].join(" "))
+    tokens.each_ngram(@n) do |ngram|
+      s.add(ngram)
     end
     s
   end

@@ -41,4 +41,14 @@ describe SentenceAnnotator do
     subject { annotator.parse("Together with Victor de Lorenzo he created the free and open access journal Symplectic Biology, devoted to publishing innovative ideas in systems and synthetic biology http://knol.google.com/k/symplectic-biology#") }
     it { subject.length.should == 1 }
   end
+
+  context "with a reused annotator" do
+    let(:parse1) { annotator.parse("I love fish.") }
+    let(:parse2) { annotator.parse("We are cool.") }
+
+    it { parse1.length.should == 1 }
+    it { parse1[0].raw.should == "I love fish." }
+    it { parse2.length.should == 1 }
+    it { parse2[0].raw.should == "We are cool."}
+  end
 end

@@ -53,7 +53,7 @@ case command
     scope.output_database.article_titles.flush
     scope.output_database.article_texts.flush
     scope.output_database.category_titles.flush
-    scope.output_database.category_article_sets.flush
+    scope.output_database.transitive_category_article_sets.flush
   when "annotate"
     require 'marshal_helper'
     require 'database_scope'
@@ -132,7 +132,7 @@ case command
     directory = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
-    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(10), db.simple_category_gateway)
+    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway)
   else
     STDERR.puts "Unknown command #{command}"
 end

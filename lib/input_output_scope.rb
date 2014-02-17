@@ -12,7 +12,7 @@ class InputOutputScope
   end
 
   def calculate_transitive_command
-    CalculateTransitiveCommand.new(input_database.category_gateway, output_database.logging_category_article_sets)
+    CalculateTransitiveCommand.new(input_database.category_gateway, output_database.logging_transitive_category_article_sets)
   end
 
   def subset_command

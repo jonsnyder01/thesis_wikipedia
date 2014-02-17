@@ -14,7 +14,7 @@ class SubsetCommand
 
   def run(category_id, minimum_category_size=100)
     @input_category_gateway.subset(@output_category_gateway, category_id, minimum_category_size)
-    article_ids = @input_category_gateway[category_id].articles
+    article_ids = @input_category_gateway[category_id].articles.to_set
     @input_article_gateway.subset(@output_article_gateway, article_ids)
   end
      

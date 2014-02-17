@@ -100,27 +100,31 @@ class TopicGateway
   def evaluate_labeler(labeler, category_gateway)
     rouge1 = RougeMetric.new(1)
     rouge2 = RougeMetric.new(2)
-    each do |topic|
-      puts topic.mallet_data.to_s
-      system = labeler.call(topic)
-      puts system
-      system_tokens = system.split(" ").map(&:downcase)
-      scores = topic.to_enum(:sorted_similarity_categories, category_gateway).take(5).map do |sim, category|
-        reference = category.title.value
-        reference_tokens = reference.split(" ").map(&:downcase)
-        rouge1_score = rouge1.call(reference_tokens, system_tokens)
-        rouge2_score = rouge2.call(reference_tokens, system_tokens)
-        [sim, rouge1_score, rouge2_score, reference]
+
+    CSV do |csv|
+      csv << %w(Topic System Reference Weight Rouge1 Rouge2 WeightedR1 WeightedR2)
+      row_number = 2
+      each do |topic|
+        row = []
+        row << topic.mallet_data.to_s
+        system = labeler.call(topic)
+        row << system[0..50].join(" ")[0..100]
+
+        scores = topic.to_enum(:sorted_similarity_categories, category_gateway).take(5).map do |sim, category|
+          reference = category.title
+          reference_tokens = reference.split(" ").map(&:downcase)
+          row[2] = reference
+          row[3] = sim
+          row[4] = rouge1.call(reference_tokens, system)
+          row[5] = rouge2.call(reference_tokens, system)
+          row[6] = "=D#{row_number}*E#{row_number}"
+          row[7] = "=D#{row_number}*F#{row_number}"
+          csv << row
+          row_number += 1
+        end
       end
 
-      r1 =      scores.map { |s, r1, r2, t| s * r1 }.inject(:+)
-      r2 =      scores.map { |s, r1, r2, t| s * r2 }.inject(:+)
-      weights = scores.map { |s, r1, r2, t| s }.inject(:+)
-      scores.each do |scores|
-        puts sprintf("%.3f %.3f %.3f %s", *scores)
-      end
-      puts sprintf("      %.3f %.3f", r1 / weights, r2 / weights)
-      puts "=============================="
+      csv << ["TOTAL","","","=SUM(D2:D#{row_number-1})","","","=SUM(G2:G#{row_number-1})/D#{row_number}","=SUM(H2:H#{row_number-1})/D#{row_number}"]
     end
   end
 end

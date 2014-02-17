@@ -1,0 +1,5 @@
+./app calculate_transitive db/full db/cs10_full Computer_science 10
+./app link db/full db/cs10_full
+./app subset db/cs10_full db/cs10 Computer_science 10
+./app annotate db/cs10
+
