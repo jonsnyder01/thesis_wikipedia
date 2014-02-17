@@ -6,13 +6,20 @@ require 'database_scope'
 
 describe SimpleCategoryGateway do
 
+  class Box
+    attr_reader :value
+    def initialize(value)
+      @value = value
+    end
+  end
+
   let(:marshal_helper) { InMemoryMarshalHelper.new }
   let(:database_scope) { DatabaseScope.new(marshal_helper) }
   let(:gateway) { database_scope.category_gateway }
 
   let(:t_marshal_helper) { InMemoryMarshalHelper.new }
   let(:t_database_scope) { DatabaseScope.new(t_marshal_helper) }
-  let(:t_article_sets) { t_database_scope.category_article_sets }
+  let(:t_article_sets) { t_database_scope.transitive_category_article_sets }
 
   let(:simple_gateway) { SimpleCategoryGateway.new(database_scope.category_titles, t_article_sets) }
 
@@ -35,10 +42,10 @@ describe SimpleCategoryGateway do
   describe "#subset" do
     it "handles a small test case" do
       
-      gateway.create(slug: "a", title: "A")
-      gateway.create(slug: "b", title: "B")
-      gateway.create(slug: "c", title: "C")
-      gateway.create(slug: "d", title: "D")
+      gateway.create(slug: "a", title: Box.new("A"))
+      gateway.create(slug: "b", title: Box.new("B"))
+      gateway.create(slug: "c", title: Box.new("C"))
+      gateway.create(slug: "d", title: Box.new("D"))
       
       gateway.find_by_slug("a").add_article(article(0))
       gateway.find_by_slug("a").add_article(article(1))
@@ -52,13 +59,13 @@ describe SimpleCategoryGateway do
       gateway.calculate_transitive_articles(t_article_sets)
 
       id = gateway.find_by_slug("c").id
-      simple_gateway[id].articles.to_a.should == [3,4,5]
-      simple_gateway[gateway.find_by_slug("d").id].articles.to_a.should == [4,5]
+      simple_gateway[id].articles.to_a.should == [[3,1],[4,2],[5,2]]
+      simple_gateway[gateway.find_by_slug("d").id].articles.to_a.should == [[4,1],[5,1]]
       
       simple_gateway.subset(subset_gateway, id, 1)
       subset_as_json.should == [
-        {"id" => 0, "title" => "C", "articles" => [0,1,2]},
-        {"id" => 1, "title" => "D", "articles" => [1,2]}
+        {"id" => 0, "title" => "C", "articles" => [[0,1],[1,2],[2,2]]},
+        {"id" => 1, "title" => "D", "articles" => [[1,1],[2,1]]}
       ]
     end
   end

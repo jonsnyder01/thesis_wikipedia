@@ -39,9 +39,6 @@ describe SentenceAnnotator do
 
   context "with a url" do
     subject { annotator.parse("Together with Victor de Lorenzo he created the free and open access journal Symplectic Biology, devoted to publishing innovative ideas in systems and synthetic biology http://knol.google.com/k/symplectic-biology#") }
-    it { subject.length.should == 1
-      puts subject.map(&:raw)
-
-    }
+    it { subject.length.should == 1 }
   end
 end

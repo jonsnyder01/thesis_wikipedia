@@ -36,16 +36,17 @@ class SimpleCategoryGateway
   end
   
   def subset(other, id, minimum_category_size=100)
-    article_id_map = Hash[@article_sets[id].each_with_index.to_a]
-    
+    article_id_map = Hash[@article_sets[id].to_set.each_with_index.to_a]
+
     (0..@size-1).each do |old_category_id|
-      article_ids = (@article_sets[id] & @article_sets[old_category_id]).map do |old_article_id|
-        article_id_map[old_article_id]
+      new_article_vector = SparseVector.new
+      @article_sets[old_category_id].each do |old_article_id, depth|
+        new_article_vector[article_id_map[old_article_id]] = depth if article_id_map.has_key?(old_article_id)
       end
-      if article_ids.size >= minimum_category_size
+      if new_article_vector.size >= minimum_category_size
         other.create(
           title: @titles[old_category_id],
-          article_set: Set.new(article_ids)
+          article_set: new_article_vector
           )
       end
     end
@@ -56,7 +57,7 @@ class SimpleCategoryGateway
       title = @titles[id]
       article_set = @article_sets[id]
       next unless title && article_set
-      file.puts JSON.dump({id: id, title: title, articles: article_set.to_a})
+      file.puts JSON.dump({id: id, title: title.value, articles: article_set.to_a})
     end
   end
 

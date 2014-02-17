@@ -125,6 +125,14 @@ case command
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     db.topic_gateway.print_top_categories_report(db.simple_category_gateway)
+  when "evaluate_labeler"
+    require 'top_word_labeler'
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(10), db.simple_category_gateway)
   else
     STDERR.puts "Unknown command #{command}"
 end

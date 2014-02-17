@@ -8,6 +8,7 @@ require 'slug_store'
 require 'object_store'
 require 'logging_object_store'
 require 'set'
+require 'sparse_vector'
 require 'sentence_annotations'
 require 'mallet_topic'
 
@@ -58,11 +59,11 @@ class DatabaseScope
   end
 
   def simple_category_gateway
-    @simple_category_gateway ||= SimpleCategoryGateway.new(category_titles,category_article_sets)
+    @simple_category_gateway ||= SimpleCategoryGateway.new(category_titles,transitive_category_article_sets)
   end
 
   def logging_simple_category_gateway
-    @logging_simple_category_gateway ||= SimpleCategoryGateway.new(logging_category_titles,category_article_sets)
+    @logging_simple_category_gateway ||= SimpleCategoryGateway.new(logging_category_titles,transitive_category_article_sets)
   end
 
   def category_slugs
@@ -85,9 +86,14 @@ class DatabaseScope
     @logging_category_article_sets ||= LoggingObjectStore.new(category_article_sets, STDERR)
   end
 
+  def transitive_category_article_sets
+    @transitive_category_article_sets ||= ObjectStore.new(@marshal_helper, "transitive_category_article_sets") { SparseVector.new }
+  end
+
   def category_child_category_sets
     @category_child_category_sets ||= ObjectStore.new(@marshal_helper, "category_child_category_sets") { Set.new }
   end
+
 
   def stopwords
     @stopwords ||= @marshal_helper.load('stopwords')

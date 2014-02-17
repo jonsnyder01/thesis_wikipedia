@@ -57,7 +57,7 @@ class CategoryGateway
   private
 
   def calculate_transitive_articles_for_category(id, store, depth)
-    STDERR.puts "  " * (10 - depth) + @titles[id].value + (store.nil?(id) ? "" : " (cached)" )
+    #STDERR.puts "  " * (10 - depth) + (@titles[id] && @titles[id].value || "") + (store.nil?(id) ? "" : " (cached)" )
     return store[id] unless store.nil?(id)
 
     a = store[id]
