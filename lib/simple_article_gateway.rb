@@ -46,10 +46,14 @@ class SimpleArticleGateway
   def annotate_all(annotator)
     p "Annotate ALL"
     p @texts.size
-    (0..@texts.size-1).each do |id|
-      next if @texts.nil?(id)
-      annotations = annotator.parse(@texts[id])
-      @annotations[id] = annotations
+    texts = Enumerator.new do |y|
+      (0..@texts.size-1).each do |id|
+        next if @texts.nil?(id)
+        y << [id, @texts[id]]
+      end
+    end
+    annotator.parse(texts).each do |id, annotation|
+      @annotations[id] = annotation
     end
   end
   

@@ -104,7 +104,7 @@ class DatabaseScope
   end
 
   def topic_gateway
-    @topic_gateway ||= TopicGateway.new(topic_mallet_topics, topic_category_vectors, topic_category_similarity_vectors)
+    @topic_gateway ||= TopicGateway.new(topic_mallet_topics, topic_category_vectors, logging_topic_category_similarity_vectors)
   end
 
   def topic_mallet_topics
@@ -115,9 +115,18 @@ class DatabaseScope
     @topic_category_vectors ||= ObjectStore.new(@marshal_helper, 'topic_category_vectors')
   end
 
+  def logging_topic_category_vectors
+    @logging_topic_category_vectors ||= LoggingObjectStore.new(topic_category_vectors, STDERR, 1)
+  end
+
   def topic_category_similarity_vectors
     @topic_category_similarity_vectors ||= ObjectStore.new(@marshal_helper, 'topic_category_similarity_vectors')
   end
+
+  def logging_topic_category_similarity_vectors
+    @logging_topic_category_similarity_vectors ||= LoggingObjectStore.new(topic_category_similarity_vectors, STDERR, 1)
+  end
+
 end
 
   

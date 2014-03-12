@@ -59,7 +59,7 @@ case command
     require 'database_scope'
     require 'sentence_annotator'
     directory = ARGV.shift
-    annotator = SentenceAnnotator.new
+    annotator = StanfordSentenceAnnotator.new
     db = DatabaseScope.new(MarshalHelper.new(directory))
     db.logging_simple_article_gateway.annotate_all(annotator)
     db.article_annotations.flush
@@ -100,10 +100,12 @@ case command
     require 'database_scope'
     require 'mallet_command'
     directory = ARGV.shift
+    topics = ARGV.shift
+    iterations = ARGV.shift
     input = MarshalHelper.new(directory)
     working_directory = MarshalHelper.new(File.join(directory, "mallet"))
     db = DatabaseScope.new(input)
-    command = MalletCommand.new(db.simple_article_gateway, db.stopwords, working_directory, db.topic_gateway)
+    command = MalletCommand.new(db.simple_article_gateway, db.stopwords, working_directory, db.topic_gateway, topics: topics, iterations: iterations)
     command.run
     db.topic_mallet_topics.flush
     db.article_annotations.flush
@@ -114,7 +116,9 @@ case command
     directory = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
+    puts "Computing Category Vectors:"
     db.topic_gateway.compute_category_vectors(db.simple_article_gateway)
+    puts "Computing Matching Categories"
     db.topic_gateway.compute_matching_categories(db.simple_category_gateway, CosineSimilarity, db.simple_article_gateway.size)
     db.topic_category_vectors.flush
     db.topic_category_similarity_vectors.flush
@@ -133,6 +137,23 @@ case command
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway)
+  when "print"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    store = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    db.send(store).print
+  when "stats"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    puts "Articles: #{db.simple_article_gateway.size}"
+    puts "Categories: #{db.simple_category_gateway.size}"
+    puts "Topics: #{db.topic_gateway.size}"
   else
     STDERR.puts "Unknown command #{command}"
 end

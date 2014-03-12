@@ -33,6 +33,12 @@ class ObjectStore
     end
   end
 
+  def print
+    objects_by_id.each_with_index do |obj, i|
+      puts obj.to_s
+    end
+  end
+
   private
 
   def objects_by_id

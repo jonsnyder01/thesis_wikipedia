@@ -6,13 +6,23 @@ StanfordCoreNLP.jar_path = path + '/'
 StanfordCoreNLP.model_path = path + '/'
 StanfordCoreNLP.log_file = File.join( path, 'log.txt')
 
-class SentenceAnnotator
+class StanfordSentenceAnnotator
 
   def initialize(pipeline=nil)
     @pipeline_config = pipeline || [:tokenize, :ssplit, :pos]
   end
 
-  def parse(text)
+  def parse(id_text_pairs)
+    Enumerator.new do |y|
+      id_text_pairs.each do |id, text|
+        y << [id, parse_sentence(text)]
+      end
+    end
+  end
+
+  private
+
+  def parse_sentence(text)
     sentences = []
     pipeline
     annotation = StanfordCoreNLP::Annotation.new(text)
@@ -33,8 +43,6 @@ class SentenceAnnotator
     end
     sentences
   end
-
-  private
 
   def pipeline
     @pipeline ||= StanfordCoreNLP.load(*@pipeline_config)

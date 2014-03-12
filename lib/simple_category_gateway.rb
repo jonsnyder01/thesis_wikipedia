@@ -69,4 +69,8 @@ class SimpleCategoryGateway
     end
   end
 
+  def size
+    @size
+  end
+
 end

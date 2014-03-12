@@ -8,11 +8,12 @@ class MalletCommand
   TOKEN_REGEX = '[^\s]+'
   MALLET = '../thesis/ir-walltriage/vendor/mallet/bin/mallet'
   
-  def initialize(article_gateway, stopwords, marshal_helper, topic_gateway)
+  def initialize(article_gateway, stopwords, marshal_helper, topic_gateway, options)
     @article_gateway = article_gateway
     @stopwords = stopwords
     @marshal_helper = marshal_helper
     @topic_gateway = topic_gateway
+    @options = options
   end
 
   def run(options={})
@@ -46,9 +47,9 @@ class MalletCommand
 private
 
   def mallet_options
-    num_topics = 10
-    num_iterations = 2000
-    optimize_burn_in = 200
+    num_topics = @options[:topics] || 10
+    num_iterations = @options[:iterations] || 2000
+    optimize_burn_in = (num_iterations * 0.1).to_i
     alpha = 50
     use_symetric_burn_in = false
     

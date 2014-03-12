@@ -41,6 +41,10 @@ class TopicGateway
     @mallet_data << mallet_topic
   end
 
+  def size
+    @mallet_data.size
+  end
+
   def each
     topic = Topic.new(@mallet_data, @category_vectors, @category_similarity_vectors)
     (0..@mallet_data.size-1).each do |topic_id|
@@ -73,8 +77,8 @@ class TopicGateway
       similarity_vector = []
       category_gateway.each do |category|
         vector = Array.new(article_count, 0)
-        category.articles.each do |article_id|
-          vector[article_id] = 1
+        category.articles.each do |article_id, depth|
+          vector[article_id] = 0.85**depth
         end
         #puts category.title
         #puts category.articles.to_a.join(",")

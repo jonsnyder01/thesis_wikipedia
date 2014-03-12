@@ -3,24 +3,33 @@ $LOAD_PATH.unshift( File.join( File.dirname(__FILE__)), 'lib' )
 
 require 'benchmark'
 require 'sentence_annotator'
+require 'parallel'
 
 sentences = Array.new(100, "I like cheese. Do you?")
 
 Benchmark.bmbm do |x|
   x.report("Long Sentence") do
-    a = SentenceAnnotator.new
+    a = StanfordSentenceAnnotator.new
     a.parse(sentences.join(" "))
   end
   x.report("Lots of Invocations") do
-    a = SentenceAnnotator.new
+    a = StanfordSentenceAnnotator.new
     sentences.each do |sentence|
       a.parse(sentence)
     end
   end
   x.report("No POS") do
-    a = SentenceAnnotator.new([:tokenize, :ssplit])
+    a = StanfordSentenceAnnotator.new([:tokenize, :ssplit])
     sentences.each do |sentence|
       a.parse(sentence)
+    end
+  end
+  x.report("Parallel processes") do
+    Parallel.each(sentences.each_slice(50), in_processes: 2) do |sentences|
+      my_a = StanfordSentenceAnnotator.new
+      sentences.each do |sentence|
+        my_a.parse(sentence)
+      end
     end
   end
 end
