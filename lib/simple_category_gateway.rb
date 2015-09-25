@@ -3,9 +3,10 @@ class SimpleCategoryGateway
   class Category
     attr_accessor :id
 
-    def initialize(titles,article_sets)
+    def initialize(titles,article_sets,annotations)
       @titles = titles
       @article_sets = article_sets
+      @annotations = annotations
     end
 
     def title
@@ -15,18 +16,23 @@ class SimpleCategoryGateway
     def articles
       @article_sets[id]
     end
+
+    def annotation
+      @annotations[id]
+    end
   end
 
   def [](id)
-    c = Category.new(@titles, @article_sets)
+    c = Category.new(@titles, @article_sets, @annotations)
     c.id = id
     c
   end
 
-  def initialize(titles, article_sets)
+  def initialize(titles, article_sets, annotations)
     @size = [titles.size,article_sets.size].min
     @titles = titles
     @article_sets = article_sets
+    @annotations = annotations
   end
 
   def create(properties)
@@ -52,6 +58,21 @@ class SimpleCategoryGateway
     end
   end
 
+  def annotate_all(annotator)
+    puts "Annotate all category titles (#{@size})"
+    texts = Enumerator.new do |y|
+      each do |category|
+        next if category.title.nil?
+        y << [category.id, category.title]
+      end
+    end
+    annotator.parse(texts).each do |id, annotation|
+      @annotations[id] = annotation.first
+      puts "Multiple Sentences! (#{annotation.size})" if annotation.size > 1
+      puts annotation.first.tokens.join(" ")
+    end
+  end
+
   def write_pipeline_file(file)
     (0..@size-1).each do |id|
       title = @titles[id]
@@ -62,7 +83,7 @@ class SimpleCategoryGateway
   end
 
   def each
-    category = Category.new(@titles, @article_sets)
+    category = Category.new(@titles, @article_sets, @annotations)
     (0..@size-1).each do |id|
       category.id = id
       yield category
@@ -71,6 +92,12 @@ class SimpleCategoryGateway
 
   def size
     @size
+  end
+
+  def print_tokenized
+    each do |category|
+      puts category.annotation.tokens.join(" ")
+    end
   end
 
 end

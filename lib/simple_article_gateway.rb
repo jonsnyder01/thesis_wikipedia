@@ -1,4 +1,5 @@
 require 'json'
+require 'similarity_matrix'
 
 class SimpleArticleGateway
 
@@ -44,8 +45,7 @@ class SimpleArticleGateway
   end
 
   def annotate_all(annotator)
-    p "Annotate ALL"
-    p @texts.size
+    puts "Annotate all article text (#{@texts.size})"
     texts = Enumerator.new do |y|
       (0..@texts.size-1).each do |id|
         next if @texts.nil?(id)
@@ -56,7 +56,7 @@ class SimpleArticleGateway
       @annotations[id] = annotation
     end
   end
-  
+
   def subset(other, article_ids)
     article_ids.each do |id|
       other.create(@titles[id], @texts[id])
@@ -82,6 +82,36 @@ class SimpleArticleGateway
       article.id = id
       yield article
     end
-  end      
-  
+  end
+
+  def print_tokenized
+    each do |article|
+      article.sentence_annotations.each do |annotation|
+        puts annotation.tokens.join(" ")
+      end
+    end
+  end
+
+  def print_topics
+    i = 0
+    each do |article|
+      article.sentence_annotations.each do |annotation|
+        i += 1
+        puts i.to_s + " " + (annotation.topics || []).join(" ")
+      end
+    end
+  end
+
+  def print_sentence_matrix(output_file, from, to)
+    i = 0
+    vectors = []
+    each do |article|
+      article.sentence_annotations.each do |annotation|
+        vectors << SimilarityMatrix::Vector.new(i, annotation.topic_counts)
+        i += 1
+      end
+    end
+    matrix = SimilarityMatrix.new(vectors)
+    matrix.calculate(output_file, from, to)
+  end
 end

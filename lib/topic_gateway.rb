@@ -1,5 +1,6 @@
 require 'topic_counts'
 require 'rouge_metric'
+require 'csv'
 
 class TopicGateway
 
@@ -78,7 +79,8 @@ class TopicGateway
       category_gateway.each do |category|
         vector = Array.new(article_count, 0)
         category.articles.each do |article_id, depth|
-          vector[article_id] = 0.85**depth
+          vector[article_id] = 1
+          #vector[article_id] = 0.85**depth
         end
         #puts category.title
         #puts category.articles.to_a.join(",")
@@ -101,11 +103,11 @@ class TopicGateway
     end
   end
 
-  def evaluate_labeler(labeler, category_gateway)
+  def evaluate_labeler(labeler, category_gateway, out_file)
     rouge1 = RougeMetric.new(1)
     rouge2 = RougeMetric.new(2)
 
-    CSV do |csv|
+    CSV.open(out_file, "wb") do |csv|
       csv << %w(Topic System Reference Weight Rouge1 Rouge2 WeightedR1 WeightedR2)
       row_number = 2
       each do |topic|
@@ -116,7 +118,7 @@ class TopicGateway
 
         scores = topic.to_enum(:sorted_similarity_categories, category_gateway).take(5).map do |sim, category|
           reference = category.title
-          reference_tokens = reference.split(" ").map(&:downcase)
+          reference_tokens = category.annotation.tokens
           row[2] = reference
           row[3] = sim
           row[4] = rouge1.call(reference_tokens, system)

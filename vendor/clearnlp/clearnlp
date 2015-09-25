@@ -1,0 +1,9 @@
+#!/bin/sh
+
+CLEARNLP=~/school/wikipedia/vendor/clearnlp/lib
+MODELS=~/school/wikipedia/vendor/clearnlp/models
+
+export CLASSPATH=$CLEARNLP/args4j-2.0.23.jar:$CLEARNLP/commons-compress-1.5.jar:$CLEARNLP/hppc-0.5.2.jar:$CLEARNLP/jregex1.2_01.jar:$CLEARNLP/slf4j-api-1.7.5.jar:$CLEARNLP/slf4j-log4j12-1.7.5.jar:$CLEARNLP/guava-14.0.1.jar:$CLEARNLP/clearnlp-lib-1.4.2.jar:$CLEARNLP/clearnlp-1.4.2.jar:.
+
+#java com.googlecode.clearnlp.run.Version
+java com.googlecode.clearnlp.run.Tokenizer -d $MODELS/dictionary-1.4.0.zip -i $1 -of tok

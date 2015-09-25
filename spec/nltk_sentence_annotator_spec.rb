@@ -11,4 +11,8 @@ describe NltkSentenceAnnotator do
   after { FileUtils.rm_rf("spec/tmp") }
 
   it_behaves_like "a sentence annotator"
+
+  it "parses category titles" do
+    annotator.tokenize([[1,"Hello World"],[2, "Goodbye (Kitty)"]]).to_a.should == [[1,["hello","world"]],[2,["goodbye","kitty"]]]
+  end
 end

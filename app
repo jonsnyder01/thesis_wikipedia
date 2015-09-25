@@ -57,10 +57,13 @@ case command
   when "annotate"
     require 'marshal_helper'
     require 'database_scope'
-    require 'sentence_annotator'
+    require 'nltk_sentence_annotator'
     directory = ARGV.shift
-    annotator = StanfordSentenceAnnotator.new
+    #annotator = StanfordSentenceAnnotator.new
+    annotator = NltkSentenceAnnotator.new("#{directory}/tmp")
     db = DatabaseScope.new(MarshalHelper.new(directory))
+    db.logging_simple_category_gateway.annotate_all(annotator)
+    db.category_annotations.flush
     db.logging_simple_article_gateway.annotate_all(annotator)
     db.article_annotations.flush
   when "json"
@@ -129,14 +132,18 @@ case command
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     db.topic_gateway.print_top_categories_report(db.simple_category_gateway)
-  when "evaluate_labeler"
+  when "evaluate_labelers"
     require 'top_word_labeler'
+    require 'entire_corpus_labeler'
     require 'marshal_helper'
     require 'database_scope'
     directory = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
-    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway)
+    puts "Top word labeler (10)"
+    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway, "#{directory}/top_word.csv")
+    puts "All word labeler"
+    db.topic_gateway.evaluate_labeler(EntireCorpusLabeler.new(db.simple_article_gateway), db.simple_category_gateway, "#{directory}/entire_corpus.csv")
   when "print"
     require 'marshal_helper'
     require 'database_scope'
@@ -145,6 +152,22 @@ case command
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     db.send(store).print
+  when "print_tokenized"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    store = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    db.send(store).print_tokenized
+  when "print_topics"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    store = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    db.send(store).print_topics
   when "stats"
     require 'marshal_helper'
     require 'database_scope'
@@ -154,6 +177,19 @@ case command
     puts "Articles: #{db.simple_article_gateway.size}"
     puts "Categories: #{db.simple_category_gateway.size}"
     puts "Topics: #{db.topic_gateway.size}"
+
+  when "sentence_matrix"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    output_file = ARGV.shift
+    from = ARGV.shift.to_i
+    to = ARGV.shift.to_i
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    File.open(output_file,"w") do |file|
+      db.simple_article_gateway.print_sentence_matrix(file, from, to)
+    end
   else
     STDERR.puts "Unknown command #{command}"
 end

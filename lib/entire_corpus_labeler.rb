@@ -1,10 +1,20 @@
 class EntireCorpusLabeler
 
-  def initialize(article_gateway, options)
+  def initialize(article_gateway, options={})
     @article_gateway = article_gateway
   end
 
   def call(topic)
+=begin
+    words = Set.new
+    bigrams = Set.new
+    categories.each do |category|
+      annotation.tokens.each_ngram(2) do |ngram|
+        bigrams << ngram.join(" ")
+      end
+    end
+    @article_gateway.each do |article|
+=end
     label
   end
 
@@ -21,7 +31,7 @@ class EntireCorpusLabeler
           tokens << "."
         end
       end
-      @label = tokens.join(" ")
+      @label = tokens
     end
 
     @label
