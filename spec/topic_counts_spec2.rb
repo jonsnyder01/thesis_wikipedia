@@ -16,6 +16,7 @@ describe TopicCounts do
 
 
   it "calculates the vector correctly" do
+    subject(0,0,0,0,0).should == [0,0,0,0,0]
     subject(10,0).should == [1,0]
     subject(10,10,10).should == [0,0,0]
     subject(4,4,8,4).should == [0,0,1,0]

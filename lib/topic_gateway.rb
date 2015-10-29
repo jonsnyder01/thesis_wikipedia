@@ -1,6 +1,9 @@
 require 'topic_counts'
 require 'rouge_metric'
 require 'csv'
+require 'ferret'
+#require 'jaccard_index'
+require 'simple_matching_coefficient'
 
 class TopicGateway
 
@@ -54,11 +57,19 @@ class TopicGateway
     end
   end
 
+  def [](id)
+    topic = Topic.new(@mallet_data, @category_vectors, @category_similarity_vectors)
+    topic.id = id
+    topic
+  end
+    
+
   def compute_category_vectors(article_gateway)
     max_topic_id = @mallet_data.size - 1
     (0..max_topic_id).each do |id|
       @category_vectors[id] = []
     end
+    i = 0
     article_gateway.each do |article|
       topic_counts = TopicCounts.new
       (article.sentence_annotations || []).each do |sentence_annotation|
@@ -66,10 +77,35 @@ class TopicGateway
           topic_counts.inc(topic_id)
         end
       end
-      vector = topic_counts.normalized_vector(max_topic_id+1)
-      vector.each_with_index do |topic_strength, id|
-        @category_vectors[id] << topic_strength
+      if i == 0
+        p topic_counts
       end
+      i += 1
+      #vector = topic_counts.normalized_vector(max_topic_id+1)
+      vector = topic_counts.statistically_significant_vector(max_topic_id+1)
+      vector.each_with_index do |topic_strength, id|
+        @category_vectors[id] << article.id if topic_strength > 0
+      end
+    end
+    (0..10).each do |id|
+      p @category_vectors[id]
+    end
+  end
+
+  def compute_matching_categories_binary_measure(category_gateway, article_count)
+    puts "Sorting Category Articles"
+    sorted_articles = {}
+    category_gateway.each do |category|
+      sorted_articles[category.id] = category.articles.to_set.sort
+    end
+    puts "Comparing Topics"
+    (0..@mallet_data.size-1).each do |topic_id|
+      similarity_vector = []
+      category_gateway.each do |category|
+        # similarity_vector[category.id] = JaccardIndex.call(@category_vectors[topic_id],sorted_articles[category.id])
+        similarity_vector[category.id] = SimpleMatchingCoefficient.call(@category_vectors[topic_id],sorted_articles[category.id],article_count) 
+      end
+      @category_similarity_vectors << similarity_vector
     end
   end
 
@@ -91,6 +127,33 @@ class TopicGateway
         similarity_vector[category.id] = s
       end
       @category_similarity_vectors << similarity_vector
+    end
+  end
+
+  def compute_matching_categories_using_ferret(category_gateway, article_count)
+    field_infos = Ferret::Index::FieldInfos.new(term_vector: :no)
+    field_infos.add_field(:id, store: :yes, index: :no)
+    field_infos.add_field(:articles, store: :no, index: :yes)
+    index = Ferret::Index::Index.new(analyzer: Ferret::Analysis::WhiteSpaceAnalyzer.new, field_infos: field_infos)
+    i = 0
+    category_gateway.each do |category|
+      if i % 1000 == 0
+        puts "Indexing Category #{i+1} of #{category_gateway.size}"
+      end
+      i+=1
+      index << {
+        id: category.id,
+        articles: category.articles.map { |article_id, depth| article_id }.join(" ")
+      }
+    end
+
+    (0..@mallet_data.size-1).each do |topic_id|
+      topic_articles = @category_vectors[topic_id].each_with_index.map { |on_or_off, article_id| on_or_off == 1 ? article_id : nil }.compact.join(" ")
+      puts topic_articles.size
+      index.search_each("articles:\"#{topic_articles}\"") do |id, score|
+        puts "TOPIC_ID: #{topic_id}, CATEGORY_ID: #{id}, SCORE:#{score}"
+        break
+      end
     end
   end
 

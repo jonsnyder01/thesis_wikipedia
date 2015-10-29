@@ -108,6 +108,7 @@ case command
     input = MarshalHelper.new(directory)
     working_directory = MarshalHelper.new(File.join(directory, "mallet"))
     db = DatabaseScope.new(input)
+    db.topic_mallet_topics.clear
     command = MalletCommand.new(db.simple_article_gateway, db.stopwords, working_directory, db.topic_gateway, topics: topics, iterations: iterations)
     command.run
     db.topic_mallet_topics.flush
@@ -122,7 +123,8 @@ case command
     puts "Computing Category Vectors:"
     db.topic_gateway.compute_category_vectors(db.simple_article_gateway)
     puts "Computing Matching Categories"
-    db.topic_gateway.compute_matching_categories(db.simple_category_gateway, CosineSimilarity, db.simple_article_gateway.size)
+    #db.topic_gateway.compute_matching_categories(db.simple_category_gateway, CosineSimilarity, db.simple_article_gateway.size)
+    db.topic_gateway.compute_matching_categories_binary_measure(db.simple_category_gateway, db.simple_article_gateway.size)
     db.topic_category_vectors.flush
     db.topic_category_similarity_vectors.flush
   when "top_categories"

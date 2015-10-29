@@ -1,0 +1,23 @@
+#!/bin/sh
+
+cd test_data
+[ -d db ] && rm -rf db
+[ -d db3 ] && rm -rf db3
+[ -d db3_subset ] && rm -rf db3_subset
+
+ruby lib/generate.rb
+cd ..
+
+cat test_data/long_abstracts.txt | ./app import long_abstracts test_data/db
+cat test_data/article_labels.txt | ./app import article_labels test_data/db
+cat test_data/category_labels.txt | ./app import category_labels test_data/db
+cat test_data/article_categories.txt | ./app import article_categories test_data/db
+cat test_data/skos_categories.txt | ./app import skos_categories test_data/db
+
+./app calculate_transitive test_data/db test_data/db3 Category0 3
+./app link test_data/db test_data/db3
+./app subset test_data/db3 test_data/db3_subset Category0 2
+./app annotate test_data/db3_subset
+cat data/stopwords | ./app stopwords test_data/db3_subset
+# ./app mallet test_data/db 5 100
+# ./app gold_standard test_data/db

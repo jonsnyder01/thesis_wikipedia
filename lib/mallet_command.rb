@@ -6,7 +6,7 @@ require 'mallet_topic'
 class MalletCommand
   
   TOKEN_REGEX = '[^\s]+'
-  MALLET = '../thesis/ir-walltriage/vendor/mallet/bin/mallet'
+  MALLET = ENV['MALLET_PATH'] || '../thesis/ir-walltriage/vendor/mallet/bin/mallet'
   
   def initialize(article_gateway, stopwords, marshal_helper, topic_gateway, options)
     @article_gateway = article_gateway
@@ -95,7 +95,12 @@ private
         sentence_annotation.tokens.each do |token|
           if !@stopwords.include?(token)
             mapped_word, topic = output_mappings_enum.next
-            raise "Not Sync'ed" if mapped_word != token
+            if mapped_word != token
+              p article.sentence_annotations
+              p mapped_word
+              p token
+              raise "Not Sync'ed "
+            end
             sentence_topics << topic
           else
             sentence_topics << nil

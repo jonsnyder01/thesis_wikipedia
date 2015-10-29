@@ -1,0 +1,10 @@
+#!/bin/sh
+
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix0 0 19999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix1 20000 39999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix2 40000 59999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix3 60000 79999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix4 80000 99999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix5 100000 119999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix6 120000 139999 &
+./app sentence_matrix db/cs3 db/cs3/sentence_matrix7 140000 -1 &

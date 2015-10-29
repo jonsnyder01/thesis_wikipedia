@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 shared_examples_for "a sentence annotator" do
 
   def parse(text)
@@ -51,4 +52,19 @@ shared_examples_for "a sentence annotator" do
     it { parse2[0].raw.should == "We are cool."}
   end
 
+  context "with diacritics" do
+    subject { parse("Éva Tardos") }
+
+    it { subject.length.should == 1 }
+    it { subject[0].tokens.should == %w[eva tardos] }
+  end
+
+  context "with long and short hyphens" do
+    subject { parse("Brain–computer interface regular-hyphen") }
+    
+    it { subject[0].tokens.should == %w[brain computer interface regular hyphen] }
+  end
+
 end
+
+

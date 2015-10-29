@@ -20,7 +20,11 @@ class TopicCounts
   end
 
   def statistically_significant_vector(topics)
-    critical_value = CriticalBinomial.critical_binomial(@sum, 1.to_f / topics)
+    if @sum == 0
+      critical_value = 1
+    else 
+      critical_value = CriticalBinomial.critical_binomial(@sum, 1.to_f / topics)
+    end
     (0..topics-1).to_a.map do |topic_id|
       (@topic_counts[topic_id] || 0) >= critical_value ? 1 : 0;
     end

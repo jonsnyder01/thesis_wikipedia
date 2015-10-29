@@ -45,6 +45,10 @@ class SlugStore
     end
   end
 
+  def print
+    p ids_by_slug
+  end
+
   private
 
   def ids_by_slug

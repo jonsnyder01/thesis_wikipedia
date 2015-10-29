@@ -39,6 +39,10 @@ class ObjectStore
     end
   end
 
+  def clear
+    @objects_by_id = []
+  end
+
   private
 
   def objects_by_id
