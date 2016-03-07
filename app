@@ -59,7 +59,6 @@ case command
     require 'database_scope'
     require 'nltk_sentence_annotator'
     directory = ARGV.shift
-    #annotator = StanfordSentenceAnnotator.new
     annotator = NltkSentenceAnnotator.new("#{directory}/tmp")
     db = DatabaseScope.new(MarshalHelper.new(directory))
     db.logging_simple_category_gateway.annotate_all(annotator)
@@ -118,13 +117,15 @@ case command
     require 'database_scope'
     require 'cosine_similarity'
     directory = ARGV.shift
+    confidence = ARGV.shift.to_f
+    measure = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     puts "Computing Category Vectors:"
-    db.topic_gateway.compute_category_vectors(db.simple_article_gateway)
+    db.topic_gateway.compute_category_vectors(db.simple_article_gateway, confidence)
     puts "Computing Matching Categories"
     #db.topic_gateway.compute_matching_categories(db.simple_category_gateway, CosineSimilarity, db.simple_article_gateway.size)
-    db.topic_gateway.compute_matching_categories_binary_measure(db.simple_category_gateway, db.simple_article_gateway.size)
+    db.topic_gateway.compute_matching_categories_binary_measure(db.simple_category_gateway, db.simple_article_gateway.size, measure)
     db.topic_category_vectors.flush
     db.topic_category_similarity_vectors.flush
   when "top_categories"
@@ -137,15 +138,24 @@ case command
   when "evaluate_labelers"
     require 'top_word_labeler'
     require 'entire_corpus_labeler'
+    require 'tf_idf_labeler'
+    require 'bigram_labeler'
+    require 'cheating_labeler'
     require 'marshal_helper'
     require 'database_scope'
     directory = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
-    puts "Top word labeler (10)"
-    db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway, "#{directory}/top_word.csv")
-    puts "All word labeler"
-    db.topic_gateway.evaluate_labeler(EntireCorpusLabeler.new(db.simple_article_gateway), db.simple_category_gateway, "#{directory}/entire_corpus.csv")
+    #puts "Top word labeler (10)"
+    #db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway, "#{directory}/top_word.csv")
+    #puts "All word labeler"
+    #db.topic_gateway.evaluate_labeler(EntireCorpusLabeler.new(db.simple_article_gateway), db.simple_category_gateway, "#{directory}/entire_corpus.csv")
+    #puts "TF-IDF Labeler (10)"
+    #db.topic_gateway.evaluate_labeler(TfIdfLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/tf_idf.csv")
+    #puts "Bigram Labeler (10)"
+    #db.topic_gateway.evaluate_labeler(BigramLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/bigram.csv")
+    puts "Cheating Labeler"
+    db.topic_gateway.evaluate_labeler(CheatingLabeler.new(db.simple_category_gateway, db.simple_article_gateway, 10), db.simple_category_gateway, "#{directory}/cheating.csv")
   when "print"
     require 'marshal_helper'
     require 'database_scope'
@@ -192,6 +202,27 @@ case command
     File.open(output_file,"w") do |file|
       db.simple_article_gateway.print_sentence_matrix(file, from, to)
     end
+  when "test_categories_in_body"
+    require 'marshal_helper'
+    require 'database_scope'
+    require 'word_trie'
+    directory = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    trie = WordTrie.new
+    counts = {}
+    db.simple_category_gateway.each do |category|
+      trie.add(category.annotation.tokens)
+      counts[category.annotation.tokens.join(" ")] = 0
+    end
+    db.simple_article_gateway.each do |article|
+      article.sentence_annotations.each do |sentence|
+        trie.count(sentence.tokens, counts)
+      end
+    end
+    p counts.size
+    p (counts.reduce(0) { |zeros, (key, value)| value == 0 ? zeros : zeros + 1 })
+    p counts.sort_by { |key, value| value }
   else
     STDERR.puts "Unknown command #{command}"
 end

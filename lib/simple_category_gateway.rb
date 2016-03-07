@@ -87,6 +87,7 @@ class SimpleCategoryGateway
     (0..@size-1).each do |id|
       category.id = id
       yield category
+      p id if id % 1000 == 0
     end
   end
 

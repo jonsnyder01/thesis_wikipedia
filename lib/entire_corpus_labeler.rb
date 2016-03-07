@@ -23,13 +23,16 @@ class EntireCorpusLabeler
   def label
     if !@label
       tokens = []
+      i = 0
       @article_gateway.each do |article|
-        article.sentence_annotations.each do |sentence|
+        article.sentence_annotations do |sentence|
           sentence.tokens.each do |token|
             tokens << token
           end
           tokens << "."
         end
+        puts i if i % 1000 == 0
+        i+=1
       end
       @label = tokens
     end

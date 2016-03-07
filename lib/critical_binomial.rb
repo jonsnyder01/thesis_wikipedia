@@ -1,11 +1,11 @@
 class CriticalBinomial
 
-  def self.critical_binomial(n,p)
+  def self.critical_binomial(n,p,confidence)
     prob = 0
     x = 0
     combinations_stream(n) do |combinations|
       prob += p**x * (1-p)**(n-x) * combinations
-      if prob >= 0.95
+      if prob >= confidence
         break
       end
       x += 1

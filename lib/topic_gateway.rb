@@ -1,9 +1,11 @@
 require 'topic_counts'
 require 'rouge_metric'
 require 'csv'
-require 'ferret'
+#require 'ferret'
 #require 'jaccard_index'
-require 'simple_matching_coefficient'
+#require 'simple_matching_coefficient'
+require 'found_versus_actual_id_analyzer'
+require 'pearson_chi_squared_test'
 
 class TopicGateway
 
@@ -28,7 +30,7 @@ class TopicGateway
     end
 
     def sorted_similarity_categories(category_gateway)
-      @category_similarity_vectors[@id].each_with_index.sort_by { |sim, id| sim.nan? ? 0 : -sim }.each do |sim, id|
+      @category_similarity_vectors[@id].each_with_index.sort_by { |sim, id| -sim }.each do |sim, id|
         yield sim, category_gateway[id]
       end
     end
@@ -64,7 +66,7 @@ class TopicGateway
   end
     
 
-  def compute_category_vectors(article_gateway)
+  def compute_category_vectors(article_gateway, confidence)
     max_topic_id = @mallet_data.size - 1
     (0..max_topic_id).each do |id|
       @category_vectors[id] = []
@@ -82,7 +84,7 @@ class TopicGateway
       end
       i += 1
       #vector = topic_counts.normalized_vector(max_topic_id+1)
-      vector = topic_counts.statistically_significant_vector(max_topic_id+1)
+      vector = topic_counts.statistically_significant_vector(max_topic_id+1, confidence)
       vector.each_with_index do |topic_strength, id|
         @category_vectors[id] << article.id if topic_strength > 0
       end
@@ -92,7 +94,7 @@ class TopicGateway
     end
   end
 
-  def compute_matching_categories_binary_measure(category_gateway, article_count)
+  def compute_matching_categories_binary_measure(category_gateway, article_count, measure)
     puts "Sorting Category Articles"
     sorted_articles = {}
     category_gateway.each do |category|
@@ -102,10 +104,22 @@ class TopicGateway
     (0..@mallet_data.size-1).each do |topic_id|
       similarity_vector = []
       category_gateway.each do |category|
+        fva = FoundVersusActualIdAnalyzer.call(@category_vectors[topic_id], sorted_articles[category.id], article_count)
+        if PearsonChiSquaredTest.is_significant(article_count, sorted_articles[category.id].size,
+                                              @category_vectors[topic_id].size, fva[:true_positive])
+
+          similarity_vector[category.id] = FoundVersusActualIdAnalyzer.method(measure).call(
+              fva[:false_negative],fva[:true_negative],
+              fva[:true_positive],fva[:false_positive])
+        else
+          similarity_vector[category.id] = 0.0
+        end
+        # similarity_vector[category.id] = FMeasure.call(@category_vectors[topic_id], sorted_articles[category.id])
         # similarity_vector[category.id] = JaccardIndex.call(@category_vectors[topic_id],sorted_articles[category.id])
-        similarity_vector[category.id] = SimpleMatchingCoefficient.call(@category_vectors[topic_id],sorted_articles[category.id],article_count) 
+        # Using the SimpleMatchingCoefficient results in Computer Science as the top match every time
+        # similarity_vector[category.id] = SimpleMatchingCoefficient.call(@category_vectors[topic_id],sorted_articles[category.id],article_count)
       end
-      @category_similarity_vectors << similarity_vector
+      @category_similarity_vectors[topic_id] = similarity_vector
     end
   end
 
@@ -126,7 +140,7 @@ class TopicGateway
         #puts "==========================="
         similarity_vector[category.id] = s
       end
-      @category_similarity_vectors << similarity_vector
+      @category_similarity_vectors[topic_id] = similarity_vector
     end
   end
 
@@ -158,10 +172,14 @@ class TopicGateway
   end
 
   def print_top_categories_report(category_gateway)
-    each do |topic|
-      puts topic.mallet_data.to_s
-      puts topic.to_enum(:sorted_similarity_categories, category_gateway).take(5)
-           .map {|sim, category| sprintf("%.3f #{category.title}",sim)}.join("\n")
+    topic_ids = []
+    each { |topic| topic_ids << [topic.id, topic.to_enum(:sorted_similarity_categories, category_gateway).take(1)[0][0]] }
+    topic_ids = topic_ids.sort_by { |id, sim| sim }
+    topic_ids.each do |topic_id, sim|
+      topic = self[topic_id]
+      puts "#{topic.mallet_data.to_s} #{topic.category_vectors.count}"
+      puts topic.to_enum(:sorted_similarity_categories, category_gateway).take(20)
+           .map {|sim, category| sprintf("%.3f #{category.title} #{category.articles.count}",sim)}.join("\n")
       puts "================"
     end
   end
@@ -177,12 +195,12 @@ class TopicGateway
         row = []
         row << topic.mallet_data.to_s
         system = labeler.call(topic)
-        row << system[0..50].join(" ")[0..100]
+        row << system[0..50].join(" ")[0..255]
 
         scores = topic.to_enum(:sorted_similarity_categories, category_gateway).take(5).map do |sim, category|
           reference = category.title
           reference_tokens = category.annotation.tokens
-          row[2] = reference
+          row[2] = reference_tokens.join(" ")
           row[3] = sim
           row[4] = rouge1.call(reference_tokens, system)
           row[5] = rouge2.call(reference_tokens, system)
@@ -191,6 +209,7 @@ class TopicGateway
           csv << row
           row_number += 1
         end
+        puts row_number - 1
       end
 
       csv << ["TOTAL","","","=SUM(D2:D#{row_number-1})","","","=SUM(G2:G#{row_number-1})/D#{row_number}","=SUM(H2:H#{row_number-1})/D#{row_number}"]

@@ -13,8 +13,8 @@ describe CriticalBinomial do
   end
 
   it "calculates the critical value correctly" do
-    CriticalBinomial.critical_binomial(100, 0.05).should == 9
-    CriticalBinomial.critical_binomial(100, 0.25).should == 32
+    CriticalBinomial.critical_binomial(100, 0.05, 0.95).should == 9
+    CriticalBinomial.critical_binomial(100, 0.25, 0.95).should == 32
   end
 end
 

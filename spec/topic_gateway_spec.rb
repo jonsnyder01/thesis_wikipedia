@@ -68,7 +68,7 @@ describe TopicGateway do
   end
 
   before do
-    topic_gateway.compute_category_vectors(article_gateway)
+    topic_gateway.compute_category_vectors(article_gateway, 0.95)
   end
 
   it { category_vectors[0].should == [0] }

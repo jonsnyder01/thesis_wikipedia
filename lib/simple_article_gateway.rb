@@ -27,7 +27,7 @@ class SimpleArticleGateway
     end
 
     def sentence_annotations
-      @annotations[@id]
+      @annotations[@id] || []
     end
   end
   
@@ -81,6 +81,7 @@ class SimpleArticleGateway
     (0..@size-1).each do |id|
       article.id = id
       yield article
+      p id if id % 1000 == 0
     end
   end
 

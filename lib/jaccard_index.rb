@@ -9,11 +9,13 @@ module JaccardIndex
       x1 = v1[i1]
       x2 = v2[i2]
       if x1 == x2
+        # true positive
         i1 += 1
         i2 += 1
         intersection += 1
         union += 1
       elsif x1 > x2
+        #
         i2 += 1
         union += 1
       else
