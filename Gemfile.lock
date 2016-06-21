@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    backports (3.4.0)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     bind-it (0.2.7-java)
@@ -33,6 +34,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  backports
   ferret
   i18n
   json

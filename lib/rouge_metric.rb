@@ -7,18 +7,22 @@ class RougeMetric
     @n = n
   end
 
-  def call(reference, system)
-    reference_tokens = token_set(reference)
-    system_tokens = token_set(system)
+  def call(references, candidates)
+    references_tokens = references.map { |reference| token_set(reference) }
+    candidate_tokens = candidates.reduce(Set.new) { |memo, candidate| token_set(candidate, memo); memo }
 
-    return 0.0 if reference_tokens.count == 0
-    system_tokens.count { |system_token| reference_tokens.include?(system_token) }.to_f / reference_tokens.count
+    possible = references_tokens.map { |reference| reference.count }.inject(0,:+)
+    return 0.0 if possible == 0
+    matches = references_tokens.map {
+        |reference| candidate_tokens.count { |candidate| reference.include?(candidate) }
+    }.inject(0,:+)
+
+    matches.to_f / possible
   end
 
   private
 
-  def token_set(tokens)
-    s = Set.new
+  def token_set(tokens, s = Set.new)
     tokens.each_ngram(@n) do |ngram|
       s.add(ngram)
     end

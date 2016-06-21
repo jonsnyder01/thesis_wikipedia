@@ -1,10 +1,11 @@
 class SentenceAnnotations
-  attr_reader :raw, :tokens, :pos, :topics
+  attr_reader :raw, :words, :tokens, :token_mapping, :topics
   
-  def initialize(raw, tokens, pos)
+  def initialize(raw, words, tokens, token_mapping)
     @raw = raw
+    @words = words
     @tokens = tokens
-    @pos = pos
+    @token_mapping = token_mapping
   end
 
   def topics=(value)

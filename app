@@ -65,6 +65,15 @@ case command
     db.category_annotations.flush
     db.logging_simple_article_gateway.annotate_all(annotator)
     db.article_annotations.flush
+  when "extract_phrases"
+    require 'marshal_helper'
+    require 'database_scope'
+    require 'nltk_phrase_extractor'
+    directory = ARGV.shift
+    extractor = NltkPhraseExtractor.new("#{directory}/tmp")
+    db = DatabaseScope.new(MarshalHelper.new(directory))
+    db.logging_simple_article_gateway.extract_phrases(extractor)
+    db.article_phrases.flush
   when "json"
     require 'marshal_helper'
     require 'database_scope'
@@ -108,7 +117,7 @@ case command
     working_directory = MarshalHelper.new(File.join(directory, "mallet"))
     db = DatabaseScope.new(input)
     db.topic_mallet_topics.clear
-    command = MalletCommand.new(db.simple_article_gateway, db.stopwords, working_directory, db.topic_gateway, topics: topics, iterations: iterations)
+    command = MalletCommand.new(db.logging_simple_article_gateway, db.stopwords, working_directory, db.topic_gateway, topics: topics, iterations: iterations)
     command.run
     db.topic_mallet_topics.flush
     db.article_annotations.flush
@@ -135,12 +144,28 @@ case command
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
     db.topic_gateway.print_top_categories_report(db.simple_category_gateway)
+  when "create_phrases"
+    require 'marshal_helper'
+    require 'database_scope'
+    directory = ARGV.shift
+    type = ARGV.shift
+    input = MarshalHelper.new(directory)
+    db = DatabaseScope.new(input)
+    if type == "n_gram"
+      db.counting_phrase_store.create_n_gram_phrases(db.simple_article_gateway, ARGV.shift.to_i)
+    elsif type == "noun"
+      db.counting_phrase_store.create_noun_phrases(db.simple_article_gateway)
+    end
+    db.counting_phrase_store.flush
   when "evaluate_labelers"
     require 'top_word_labeler'
     require 'entire_corpus_labeler'
     require 'tf_idf_labeler'
     require 'bigram_labeler'
     require 'cheating_labeler'
+    require 'cheating_tfidf_labeler'
+    require 'cosine_similarity_labeler'
+    require 'topic_vector_generator'
     require 'marshal_helper'
     require 'database_scope'
     directory = ARGV.shift
@@ -154,8 +179,28 @@ case command
     #db.topic_gateway.evaluate_labeler(TfIdfLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/tf_idf.csv")
     #puts "Bigram Labeler (10)"
     #db.topic_gateway.evaluate_labeler(BigramLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/bigram.csv")
-    puts "Cheating Labeler"
-    db.topic_gateway.evaluate_labeler(CheatingLabeler.new(db.simple_category_gateway, db.simple_article_gateway, 10), db.simple_category_gateway, "#{directory}/cheating.csv")
+    #puts "Cheating Labeler"
+    #db.topic_gateway.evaluate_labeler(CheatingLabeler.new(db.simple_category_gateway, db.simple_article_gateway, 10), db.simple_category_gateway, "#{directory}/cheating.csv")
+    #puts "Cheating TF-IDF Labeler"
+    #db.topic_gateway.evaluate_labeler(CheatingTfidfLabeler.new(db.simple_category_gateway, db.simple_article_gateway, db.topic_gateway.size), db.simple_category_gateway, "#{directory}/cheating_tfidf.csv")
+    topic_vector_generator = TopicVectorGenerator.new(db.simple_article_gateway)
+    #puts "Cosine Similarity Labeler"
+    #db.topic_gateway.evaluate_labeler2(
+    #    CosineSimilarityLabeler.new(db.counting_phrase_store.counting_phrase,
+    #                                topic_vector_generator.frequency_topic_vectors, 10),
+    #    db.simple_category_gateway, "#{directory}/cosine_similarity.txt")
+    no_boost = Proc.new { |freq| 1 }
+    linear_boost = Proc.new { |freq| freq }
+    sqrt_boost = Proc.new { |freq| Math.sqrt(freq) }
+    log_boost = Proc.new { |freq| Math.log(freq + 1) }
+    puts "TF-IDF Labeler"
+    {no: no_boost, linear: linear_boost, sqrt: sqrt_boost, log: log_boost}.each do |name, boost_function|
+      puts name
+      db.topic_gateway.evaluate_labeler2(
+          CosineSimilarityLabeler.new(db.counting_phrase_store.counting_phrase,
+                                      topic_vector_generator.tf_idf_topic_vectors, boost_function),
+          db.simple_category_gateway, "#{directory}/tf_idf_noun_phrase_#{name}_boost.txt")
+    end
   when "print"
     require 'marshal_helper'
     require 'database_scope'
@@ -189,6 +234,13 @@ case command
     puts "Articles: #{db.simple_article_gateway.size}"
     puts "Categories: #{db.simple_category_gateway.size}"
     puts "Topics: #{db.topic_gateway.size}"
+    t = 0
+    db.simple_article_gateway.each do |article|
+      article.sentence_annotations.each do |sentence|
+        t += sentence.tokens.size
+      end
+    end
+    puts "Tokens: #{t}"
 
   when "sentence_matrix"
     require 'marshal_helper'

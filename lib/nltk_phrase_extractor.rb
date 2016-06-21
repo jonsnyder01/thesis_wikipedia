@@ -1,26 +1,26 @@
 require 'command'
-require 'sentence_annotations'
+require 'chunked_phrase'
 require 'json'
 require 'i18n'
 require 'parallel'
 
-class NltkSentenceAnnotator
+class NltkPhraseExtractor
 
-  NLTK = "python ./vendor/nltk/sentence_split.py"
+  NLTK = "python ./vendor/nltk/title_chunk.py"
 
   def initialize(temp_folder)
     @temp_folder = temp_folder
   end
 
-  def parse(id_text_pairs)
+  def run(id_annotation_pairs)
     Dir.mkdir(@temp_folder) unless Dir.exist?(@temp_folder)
 
     slice_index = 0
-    filenames = id_text_pairs.each_slice(5000).map do |id_text_pairs_batch|
+    filenames = id_annotation_pairs.each_slice(10000).map do |id_annotation_pairs_batch|
       filename = "#{@temp_folder}/text#{slice_index}"
       File.open(filename,"w") do |f|
-        id_text_pairs_batch.each do |id, text|
-          f.puts(JSON.generate({id: id, text: text}))
+        id_annotation_pairs_batch.each do |id, annotations|
+          f.puts(JSON.generate({id: id, sentences: annotations.map {|annotation| annotation.words}}))
         end
       end
       slice_index += 1
@@ -32,10 +32,13 @@ class NltkSentenceAnnotator
       Command.run("#{NLTK} #{filename}") do |line|
         next if line.nil?
         parsed = JSON.parse(line)
-        annotations = parsed["sentences"].map do |sentence|
+        if parsed["id"] % 100 == 0
+          puts parsed["id"]
+        end
+        phrases = parsed["phrases"].map do |phrase|
           tokens = []
           token_mapping = []
-          sentence["tokens"].each_with_index do |token, index|
+          phrase.each_with_index do |token, index|
             I18n.transliterate(token).downcase.sub("-"," ").sub("?"," ").split(" ").each do |clean_token|
               if clean_token.match(/[A-Za-z0-9]/)
                  tokens << clean_token
@@ -43,9 +46,9 @@ class NltkSentenceAnnotator
               end
             end
           end
-          SentenceAnnotations.new(sentence["raw"].strip, sentence["tokens"], tokens, token_mapping)
+          ChunkedPhrase.new(phrase, tokens, token_mapping)
         end
-        results << [parsed["id"], annotations]
+        results << [parsed["id"], phrases]
       end
       results
     end

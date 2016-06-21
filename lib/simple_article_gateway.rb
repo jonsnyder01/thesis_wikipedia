@@ -4,10 +4,11 @@ require 'similarity_matrix'
 class SimpleArticleGateway
 
   class Article
-    def initialize(titles, texts, annotations)
+    def initialize(titles, texts, annotations, phrases)
       @titles = titles
       @texts = texts
       @annotations = annotations
+      @phrases = phrases
     end
 
     def id=(value)
@@ -29,13 +30,18 @@ class SimpleArticleGateway
     def sentence_annotations
       @annotations[@id] || []
     end
+
+    def phrases
+      @phrases[@id] || []
+    end
   end
   
-  def initialize(titles,texts,annotations)
+  def initialize(titles,texts,annotations,phrases)
     @size = [titles.size,texts.size].min
     @titles = titles
     @texts = texts
     @annotations = annotations
+    @phrases = phrases
   end
 
   def create(title, text)
@@ -57,6 +63,20 @@ class SimpleArticleGateway
     end
   end
 
+  def extract_phrases(phrase_extractor)
+    puts "Extracting phrases"
+    texts = Enumerator.new do |y|
+      (0..@annotations.size-1).each do |id|
+        next if @annotations.nil?(id)
+        y << [id, @annotations[id]]
+      end
+    end
+    phrase_extractor.run(texts).each do |id, phrases|
+      @phrases[id] = phrases
+    end
+  end
+
+
   def subset(other, article_ids)
     article_ids.each do |id|
       other.create(@titles[id], @texts[id])
@@ -77,7 +97,7 @@ class SimpleArticleGateway
   end
 
   def each
-    article = Article.new(@titles, @texts, @annotations)
+    article = Article.new(@titles, @texts, @annotations, @phrases)
     (0..@size-1).each do |id|
       article.id = id
       yield article

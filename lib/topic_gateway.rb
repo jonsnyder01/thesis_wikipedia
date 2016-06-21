@@ -202,8 +202,8 @@ class TopicGateway
           reference_tokens = category.annotation.tokens
           row[2] = reference_tokens.join(" ")
           row[3] = sim
-          row[4] = rouge1.call(reference_tokens, system)
-          row[5] = rouge2.call(reference_tokens, system)
+          row[4] = rouge1.call([reference_tokens], system)
+          row[5] = rouge2.call([reference_tokens], system)
           row[6] = "=D#{row_number}*E#{row_number}"
           row[7] = "=D#{row_number}*F#{row_number}"
           csv << row
@@ -215,4 +215,56 @@ class TopicGateway
       csv << ["TOTAL","","","=SUM(D2:D#{row_number-1})","","","=SUM(G2:G#{row_number-1})/D#{row_number}","=SUM(H2:H#{row_number-1})/D#{row_number}"]
     end
   end
+
+  def evaluate_labeler2(labeler, category_gateway, out_file)
+    rouge1 = RougeMetric.new(1)
+    rouge2 = RougeMetric.new(2)
+    topics_score = []
+    each do |topic|
+      scores = topic.to_enum(:sorted_similarity_categories, category_gateway).take(3).map { |sim, category| sim }
+      topics_score << [topic.id, scores.inject(0,:+).to_f/scores.count]
+    end
+    topics_score = topics_score.sort_by { |topic_id, score| -1 * score }
+
+    total_r1 = 0
+    total_r2 = 0
+    File.open(out_file, "w") do |file|
+      topics_score.each do |topic_id, score|
+        topic = self[topic_id]
+        file.puts topic.mallet_data.to_s + "\n"
+        references_tokens = []
+        topic.to_enum(:sorted_similarity_categories, category_gateway).take(3).each do |sim, category|
+          file.puts sprintf("%5.2f %s\n", sim, category.annotation.tokens.join(' '))
+          references_tokens << category.annotation.tokens
+        end
+
+        if labeler.method(:call).arity == 2
+          candidate_labels = labeler.call(topic, references_tokens)
+        else
+          candidate_labels = labeler.call(topic)
+        end
+
+        candidate_labels_tokens = candidate_labels.take(3).map(&:tokens)
+        r1 = rouge1.call(references_tokens, candidate_labels_tokens)
+        r2 = rouge2.call(references_tokens, candidate_labels_tokens)
+        total_r1 += r1
+        total_r2 += r2
+
+        file.puts sprintf("%10.6f %10.6f", r1, r2)
+        candidate_labels.each do |candidate_label|
+          file.puts candidate_label.to_s
+        end
+
+        file.puts "\n"
+      end
+
+      r1 = sprintf("Top 3 candidate R1 Average: %10.6f\n", total_r1 / topics_score.count)
+      r2 = sprintf("Top 3 candidate R2 Average: %10.6f\n", total_r2 / topics_score.count)
+      file.puts r1
+      file.puts r2
+      puts r1
+      puts r2
+    end
+  end
+
 end

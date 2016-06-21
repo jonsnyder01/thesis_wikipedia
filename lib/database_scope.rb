@@ -11,6 +11,8 @@ require 'set'
 require 'sparse_vector'
 require 'sentence_annotations'
 require 'mallet_topic'
+require 'counting_phrase_store'
+require 'chunked_phrase'
 
 class DatabaseScope
 
@@ -23,11 +25,11 @@ class DatabaseScope
   end
 
   def simple_article_gateway
-    @simple_article_gateway ||= SimpleArticleGateway.new(article_titles, article_texts, article_annotations)
+    @simple_article_gateway ||= SimpleArticleGateway.new(article_titles, article_texts, article_annotations, article_phrases)
   end
 
   def logging_simple_article_gateway
-    @logging_simple_article_gateway ||= SimpleArticleGateway.new(logging_article_titles,article_texts,logging_article_annotations)
+    @logging_simple_article_gateway ||= SimpleArticleGateway.new(logging_article_titles,article_texts,logging_article_annotations,logging_article_phrases)
   end
 
   def article_slugs
@@ -52,6 +54,14 @@ class DatabaseScope
 
   def logging_article_annotations
     @logging_article_annotations ||= LoggingObjectStore.new(article_annotations, STDERR, 100)
+  end
+
+  def article_phrases
+    @article_phrases ||= ObjectStore.new(@marshal_helper, 'article_phrases')
+  end
+
+  def logging_article_phrases
+    @logging_article_phrases ||= LoggingObjectStore.new(article_phrases, STDERR, 100)
   end
 
   def category_gateway
@@ -132,6 +142,10 @@ class DatabaseScope
 
   def logging_topic_category_similarity_vectors
     @logging_topic_category_similarity_vectors ||= LoggingObjectStore.new(topic_category_similarity_vectors, STDERR, 1)
+  end
+
+  def counting_phrase_store
+    @counting_phrase_store ||= CountingPhraseStore.new(@marshal_helper, 'counting_phrase')
   end
 
 end
