@@ -5,7 +5,6 @@ class WordFrequency
     @freq = Hash.new
     @freq.default = 0
     @count = 0
-    @llsp = {}
   end
 
   def add( word)
@@ -49,9 +48,6 @@ class WordFrequency
     words
   end
 
-  def log_laplace_smoothing_prob( word)
-    @llsp[word] ||= Math.log( (freq( word) + 1).to_f / (@count + @freq.keys.count))
-  end
 
   def length
     @l ||= Math.sqrt( (@freq.values.reduce(0) { |sum,freq| sum + (freq*freq) }).to_f)
@@ -62,6 +58,10 @@ class WordFrequency
     @freq.each { |word,freq| sum += freq * other.freq(word) }
     sum / (length * other.length)
   end
+=begin
+  def log_laplace_smoothing_prob( word)
+    @llsp[word] ||= Math.log( (freq( word) + 1).to_f / (@count + @freq.keys.count))
+  end
 
   def cross_entropy(other)
     sum = 0
@@ -71,7 +71,7 @@ class WordFrequency
     end
     sum
   end
-
+=end
   def keep_only_top(n)
     @freq = Hash[@freq.sort_by { |word, freq| -1 * freq}.take(n)]
     @freq.default = 0
@@ -79,4 +79,11 @@ class WordFrequency
     @llsp = {}
   end
 
+  def count
+    @count
+  end
+
+  def to_s
+    @freq.to_s
+  end
 end

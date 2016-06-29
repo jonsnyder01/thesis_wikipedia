@@ -1,0 +1,21 @@
+#!/bin/sh
+
+CATEGORY=$1
+CATEGORY_LOWER=$(echo "$CATEGORY" | tr '[:upper:]' '[:lower:]')
+DEPTH=$2
+TOPICS=$3
+DIRECTORY=db/${CATEGORY_LOWER}${DEPTH}_${TOPICS}
+
+if [ ! -d "db/${CATEGORY_LOWER}${DEPTH}" ]; then
+  ./app calculate_transitive db/full ${DIRECTORY}_full $CATEGORY $DEPTH
+fi
+
+./app link db/full ${DIRECTORY}_full
+./app subset ${DIRECTORY}_full $DIRECTORY $CATEGORY 10
+./app stats ${DIRECTORY}
+
+./app annotate $DIRECTORY
+cat data/stopwords | ./app stopwords $DIRECTORY
+./app mallet $DIRECTORY $TOPICS 2000
+./app extract_phrases $DIRECTORY
+./app create_phrases $DIRECTORY noun

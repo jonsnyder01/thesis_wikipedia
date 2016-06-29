@@ -55,4 +55,36 @@ class CountingWordTrie
     @hash
   end
 
+  def find_phrases_in_sentence(words)
+    phrases = []
+    words.each_with_index do |word, i|
+      trie = self
+      j = i
+      while j < words.size && trie.hash.has_key?(words[j])
+        trie = trie.hash[words[j]]
+        if trie.terminal
+          phrases << words[i..j].join(" ")
+        end
+        j += 1
+      end
+    end
+    phrases
+  end
+
+  def phrases
+    Enumerator.new do |y|
+      recursive_phrases(y, [])
+    end
+  end
+
+  def recursive_phrases(y, phrase)
+    hash.each do |word, trie|
+      new_phrase = phrase + [word]
+      if (word.terminal)
+        y << new_phrase
+      end
+      trie.recursive_phrases(y, new_phrase)
+    end
+  end
+
 end

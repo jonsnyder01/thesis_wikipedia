@@ -158,49 +158,53 @@ case command
     end
     db.counting_phrase_store.flush
   when "evaluate_labelers"
-    require 'top_word_labeler'
-    require 'entire_corpus_labeler'
-    require 'tf_idf_labeler'
-    require 'bigram_labeler'
-    require 'cheating_labeler'
-    require 'cheating_tfidf_labeler'
-    require 'cosine_similarity_labeler'
-    require 'topic_vector_generator'
     require 'marshal_helper'
     require 'database_scope'
     directory = ARGV.shift
     input = MarshalHelper.new(directory)
     db = DatabaseScope.new(input)
-    #puts "Top word labeler (10)"
-    #db.topic_gateway.evaluate_labeler(TopWordLabeler.new(db.simple_article_gateway, size: 10), db.simple_category_gateway, "#{directory}/top_word.csv")
-    #puts "All word labeler"
-    #db.topic_gateway.evaluate_labeler(EntireCorpusLabeler.new(db.simple_article_gateway), db.simple_category_gateway, "#{directory}/entire_corpus.csv")
-    #puts "TF-IDF Labeler (10)"
-    #db.topic_gateway.evaluate_labeler(TfIdfLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/tf_idf.csv")
-    #puts "Bigram Labeler (10)"
-    #db.topic_gateway.evaluate_labeler(BigramLabeler.new(db.simple_article_gateway, db.topic_gateway.size, size: 10), db.simple_category_gateway, "#{directory}/bigram.csv")
-    #puts "Cheating Labeler"
-    #db.topic_gateway.evaluate_labeler(CheatingLabeler.new(db.simple_category_gateway, db.simple_article_gateway, 10), db.simple_category_gateway, "#{directory}/cheating.csv")
-    #puts "Cheating TF-IDF Labeler"
-    #db.topic_gateway.evaluate_labeler(CheatingTfidfLabeler.new(db.simple_category_gateway, db.simple_article_gateway, db.topic_gateway.size), db.simple_category_gateway, "#{directory}/cheating_tfidf.csv")
-    topic_vector_generator = TopicVectorGenerator.new(db.simple_article_gateway)
-    #puts "Cosine Similarity Labeler"
-    #db.topic_gateway.evaluate_labeler2(
-    #    CosineSimilarityLabeler.new(db.counting_phrase_store.counting_phrase,
-    #                                topic_vector_generator.frequency_topic_vectors, 10),
-    #    db.simple_category_gateway, "#{directory}/cosine_similarity.txt")
-    no_boost = Proc.new { |freq| 1 }
-    linear_boost = Proc.new { |freq| freq }
-    sqrt_boost = Proc.new { |freq| Math.sqrt(freq) }
-    log_boost = Proc.new { |freq| Math.log(freq + 1) }
-    puts "TF-IDF Labeler"
-    {no: no_boost, linear: linear_boost, sqrt: sqrt_boost, log: log_boost}.each do |name, boost_function|
-      puts name
-      db.topic_gateway.evaluate_labeler2(
-          CosineSimilarityLabeler.new(db.counting_phrase_store.counting_phrase,
-                                      topic_vector_generator.tf_idf_topic_vectors, boost_function),
-          db.simple_category_gateway, "#{directory}/tf_idf_noun_phrase_#{name}_boost.txt")
+
+    labeler = ARGV.shift
+    case(labeler)
+      when "first_order"
+        require 'topic_vector_generator'
+        require 'hybrid_first_order_labeler'
+        topic_vector_generator = TopicVectorGenerator.new(db.simple_article_gateway)
+        labeler =  HybridFirstOrderLabeler.new(db.simple_article_gateway, db.counting_phrase_store.counting_phrase,
+                                               topic_vector_generator.frequency_topic_vectors, 10)
+        file_name = "first_order"
+      when "cheating"
+        require 'cheating_labeler'
+        labeler = CheatingLabeler.new(db.counting_phrase_store.counting_phrase)
+        file_name = "cheating"
+      when "cosine"
+        require 'topic_vector_generator'
+        require 'cosine_similarity_labeler'
+        topic_vector_generator = TopicVectorGenerator.new(db.simple_article_gateway)
+        vectors_name = ARGV.shift
+        vectors = topic_vector_generator.send("#{vectors_name}_topic_vectors")
+        boost_name = ARGV.shift
+        case boost_name
+          when "none"
+            boost_function = Proc.new { |freq| 1 }
+          when "log"
+            boost_function = Proc.new { |freq| Math.log(freq + 1) }
+          when "sqrt"
+            boost_function = Proc.new { |freq| Math.sqrt(freq) }
+          when "linear"
+            boost_function = Proc.new { |freq| freq }
+        end
+        labeler = CosineSimilarityLabeler.new(db.counting_phrase_store.counting_phrase,
+                                              vectors, boost_function, 10)
+        file_name = "cosine_#{vectors_name}_#{boost_name}"
     end
+
+    #File.open("#{directory}/#{file_name}.txt", "w") do |file|
+    #  file.puts "Test"
+    #end
+    db.topic_gateway.evaluate_labeler2(
+        labeler, db.simple_category_gateway, "#{directory}/#{file_name}.txt")
+
   when "print"
     require 'marshal_helper'
     require 'database_scope'

@@ -1,7 +1,27 @@
+require 'word_frequency'
+
 class TopicVectorGenerator
 
   def initialize(article_gateway)
     @article_gateway = article_gateway
+  end
+
+  def zero_order_topic_vectors
+    topic_vectors = {}
+    word_freq = WordFrequency.new
+    all_token_topic_pairs.each do |token, topic|
+      word_freq.add(token)
+      topic_vectors[topic] ||= Hash.new(0)
+      topic_vectors[topic][token] += 1
+    end
+
+    topic_vectors.each do |topic, vectors|
+      vectors.each do |word, freq|
+        vectors[word] = freq.to_f / word_freq.freq(word)
+      end
+    end
+
+    topic_vectors
   end
 
   def frequency_topic_vectors
@@ -50,4 +70,5 @@ class TopicVectorGenerator
       end
     end
   end
+
 end

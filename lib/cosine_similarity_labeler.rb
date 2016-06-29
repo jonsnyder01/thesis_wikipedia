@@ -5,10 +5,11 @@ require 'candidate_label'
 
 class CosineSimilarityLabeler
 
-  def initialize(counting_phrase, topic_vectors, boost_function)
+  def initialize(counting_phrase, topic_vectors, boost_function, size)
     @counting_phrase = counting_phrase
     @topic_vectors = topic_vectors
     @boost_function = boost_function
+    @size = size
   end
 
   def call(topic)

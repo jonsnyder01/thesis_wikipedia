@@ -27,7 +27,7 @@ class NltkPhraseExtractor
       filename
     end
 
-    batches = Parallel.map(filenames) do |filename|
+    batches = Parallel.map(filenames, in_processes: 4) do |filename|
       results = []
       Command.run("#{NLTK} #{filename}") do |line|
         next if line.nil?

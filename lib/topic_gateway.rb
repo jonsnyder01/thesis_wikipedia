@@ -228,8 +228,11 @@ class TopicGateway
 
     total_r1 = 0
     total_r2 = 0
+    total_r1_50 = 0
+    total_r2_50 = 0
+    total_50_count = 1
     File.open(out_file, "w") do |file|
-      topics_score.each do |topic_id, score|
+      topics_score.each_with_index do |(topic_id, score), i|
         topic = self[topic_id]
         file.puts topic.mallet_data.to_s + "\n"
         references_tokens = []
@@ -250,6 +253,12 @@ class TopicGateway
         total_r1 += r1
         total_r2 += r2
 
+        if i < topics_score.size.to_f / 2
+          total_r1_50 = total_r1
+          total_r2_50 = total_r2
+          total_50_count = i + 1
+        end
+
         file.puts sprintf("%10.6f %10.6f", r1, r2)
         candidate_labels.each do |candidate_label|
           file.puts candidate_label.to_s
@@ -260,10 +269,16 @@ class TopicGateway
 
       r1 = sprintf("Top 3 candidate R1 Average: %10.6f\n", total_r1 / topics_score.count)
       r2 = sprintf("Top 3 candidate R2 Average: %10.6f\n", total_r2 / topics_score.count)
+      r3 = sprintf("Top 3 candidate R1 Average 50: %10.6f\n", total_r1_50 / total_50_count)
+      r4 = sprintf("Top 3 candidate R2 Average 50: %10.6f\n", total_r2_50 / total_50_count)
       file.puts r1
       file.puts r2
+      file.puts r3
+      file.puts r4
       puts r1
       puts r2
+      puts r3
+      puts r4
     end
   end
 

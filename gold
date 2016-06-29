@@ -1,9 +1,0 @@
-./app calculate_transitive db/full db/cs5_full Computer_science 5
-./app link db/full db/cs5_full
-./app subset db/cs5_full db/cs5 Computer_science 10
-./app annotate db/cs5
-cat data/stopwords | ./app stopwords db/cs5
-./app mallet db/cs5 100 5000
-./app gold_standard db/cs5
-
-

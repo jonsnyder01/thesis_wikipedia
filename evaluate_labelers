@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+MEASURE=$2
+
+./app gold_standard $1 0.95 $MEASURE
+
+./app evaluate_labelers $1 cheating
+
+./app evaluate_labelers $1 cosine frequency none
+./app evaluate_labelers $1 cosine frequency log
+./app evaluate_labelers $1 cosine frequency sqrt
+./app evaluate_labelers $1 cosine frequency linear
+
+./app evaluate_labelers $1 cosine tf_idf none
+./app evaluate_labelers $1 cosine tf_idf log
+./app evaluate_labelers $1 cosine tf_idf sqrt
+./app evaluate_labelers $1 cosine tf_idf linear
+
+./app evaluate_labelers $1 first_order
+
+rm -rf $1/$MEASURE
+mkdir $1/$MEASURE
+mv $1/*.txt $1/$MEASURE/

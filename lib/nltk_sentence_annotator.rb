@@ -32,6 +32,9 @@ class NltkSentenceAnnotator
       Command.run("#{NLTK} #{filename}") do |line|
         next if line.nil?
         parsed = JSON.parse(line)
+        if parsed["id"] % 1000 == 0
+          puts parsed["id"]
+        end
         annotations = parsed["sentences"].map do |sentence|
           tokens = []
           token_mapping = []

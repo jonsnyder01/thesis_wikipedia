@@ -71,4 +71,14 @@ describe CountingWordTrie do
     subject.hash['i'].hash['like'].hash['cats'].terminal.should == true
     subject.hash['i'].hash['like'].hash['dogs'].terminal.should == true
   end
+
+  it 'can find the phrases in a sentence' do
+    subject.add_phrase(%w(i like))
+    subject.add_phrase(%w(like cats))
+    subject.add_phrase(%w(do))
+
+    subject.find_phrases_in_sentence(%w(i like cats yes i do)).should == ["i like","like cats", "do"]
+    subject.find_phrases_in_sentence(%w(a b c d e)).should == []
+    subject.find_phrases_in_sentence(%w(do)).should == ["do"]
+  end
 end
