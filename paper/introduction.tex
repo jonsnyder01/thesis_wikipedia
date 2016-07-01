@@ -1,0 +1,69 @@
+\chapter{Introduction}
+Classifying responses can be a useful text mining technique.  Traditional classification approaches are labor-intensive \cite{jackson2002concept}, but topic models \cite{blei2009topic} have recently been shown to be a powerful unsupervised tool to identify latent text patterns.  
+
+Topic models seek to capture the latent topics inherent in the data.  Using information related to the co-occurrence of words, topic models tease out which words occur frequently with which other words, and group them into topics.  The result of this computation is that each word in the corpus is assigned to a topic.  Analysis is done to determine the top occurring words for each topic, and the topic distribution for each document.  From this, a user can understand what the top occurring ideas are in the documents, and also browse the documents containing those topics.  One of the problems with this, however, is that the title for a topic model is simply a list of words.  This is not a friendly label for a user to digest, and requires an understanding of topic model theory.  A better way to accomplish this would be to provide a title for the topic.  This thesis explores a new method for the automatic labeling of topic models.
+
+Topic models can provide a nonhierarchical soft clustering of the documents using the document-topic probabilities.  Labeling the document according to the most represented topic results in a hard clustering.  In the domain of Facebook brand pages, topic models can be used to understand the concerns and general feelings of the page's fans.  The words that occur most frequently in a topic provide a representation for the ideas that are expressed in the topic. For example, Table \ref{table:samsung1} and Table \ref{table:samsung2} lists some of the most frequently occurring words in two topics extracted from Samsung Mobile's Facebook page.
+\begin{table}
+	\begin{center}
+	\begin{spacing}{2.0}
+		\begin{tabular}{rc}
+			\hline
+			Frequency & Word\\
+			\hline
+			2193 & galaxy\\
+			1852 & love\\
+			1711 & samsung\\
+			902 & note\\
+			841 & 2\\
+			607 & lii\\
+			552 & mobile\\
+			351 & awesome\\
+			\hline
+		\end{tabular}
+		\caption{A Topic Extracted from Samsung Mobile's Facebook Page}
+		\label{table:samsung1}
+	\end{spacing}
+	\end{center}
+\end{table}
+\begin{table}
+	\begin{center}
+	\begin{spacing}{2.0}
+		\begin{tabular}{rc}
+			\hline
+			Frequency & Word\\
+			\hline
+			1159 & phone\\
+			493 & battery\\
+			467 & time\\
+			368 & work\\
+			304 & sprint\\
+			230 & back\\
+			210 & problems\\
+			187 & apps\\
+			\hline
+		\end{tabular}
+		\caption{Another Topic Extracted from Samsung Mobile's Facebook Page}
+		\label{table:samsung2}
+	\end{spacing}
+	\end{center}
+\end{table}
+The topic in Table \ref{table:samsung1} most likely represents customers happy with Samsung phones, and the topic in Table \ref{table:samsung2} most likely represents customers complaining about battery life issues, but it is hard to know if that labeling is correct with the limited information of just the top topic words.
+
+\section{Latent Dirichlet Allocation}
+Latent Dirichlet Allocation (LDA) \cite{blei2003latent} is a standard algorithm for topic modeling.  LDA uses a probabilistic generative model, which requires very little human intervention.   The idea in LDA is that each document is composed of a set of topics.  The probability of a topic occurring in a document follows a Dirichlet distribution which favors giving a few topics high probability with the others receiving low probability.  Each topic then has a probability distribution of words.  See chapter \ref{} for a more detailed description of the theory behind LDA.  Continuing the example from Facebook data, the word `Äúbattery'Äù has a high probability of occurring for the second topic example given previously.  The following gives an example of a post.  The numbered superscripts on some of the words indicate that they belong to one of the previous two topics:
+\begin{quote}
+I love\textsuperscript{1} Samsung\textsuperscript{1} with a passion\ldots i had the galaxy\textsuperscript{1} II\textsuperscript{1} but the battery\textsuperscript{2} died really quick\ldots it stopped charging\textsuperscript{2} completely\textsuperscript{2} so I had to send it away.
+\end{quote}
+LDA has extracted 2 topics from the sentence.  Topic 1 having to do with loving the phone, and Topic 2 having to do with battery life. The other words in the sentence were filtered out as stop words or part of other topics.
+
+\section{General Approach}
+One of the difficulties with research on automatic labeling is that there is how to measure the accuracy of a generated label.  Most research uses human annotators to measure the quality of the generated labels.  Indeed, looking at the top words for a topic may not be enough to capture the nuance of the topic.  It may be necessary to look at the documents containing those topics.
+
+In addition to the large corpus of articles Wikipedia provides, it also contains a hierarchy of categories.  The categories can be used to simulate a topic model, and can be matched to a topic model found in the same dataset. In this thesis, a Wikipedia dataset is used to generate a set of gold standard category labels against a set of Topic Models generated from the same dataset.  
+
+\section{Contribution}
+The contribution to the computer science body of knowledge is an automated method for measuring the quality of generated topic model labels.  Methods detailed in other research are applied to the dataset to test the validity of the method.
+
+\section{Overview}
+Chapter 2 details the related work in opinion mining, topic modeling, and the automatic labeling of topic models.  Chapter 3 gives theoretical background of Latent Dirichlet Allocation including mixture models, generative models, Dirichlet distributions.  The implemented labeling methods are outlined in chapter 4.  Chapter 5 describes in detail the automated method for measuring the quality of the generated topic labels.  Finally, chapter 6 details the results of the labeling methods.

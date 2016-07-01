@@ -1,0 +1,138 @@
+\begin{thebibliography}{10}
+
+\bibitem{jackson2002concept}
+K.~M. Jackson and W.~M. Trochim, ``Concept mapping as an alternative approach
+  for the analysis of open-ended survey responses,'' {\em Organizational
+  Research Methods}, vol.~5, no.~4, pp.~307--336, 2002.
+
+\bibitem{blei2009topic}
+D.~M. Blei and J.~D. Lafferty, ``Topic models,'' {\em Text mining:
+  classification, clustering, and applications}, vol.~10, no.~71, p.~34, 2009.
+
+\bibitem{blei2003latent}
+D.~M. Blei, A.~Y. Ng, and M.~I. Jordan, ``Latent dirichlet allocation,'' {\em
+  the Journal of machine Learning research}, vol.~3, pp.~993--1022, 2003.
+
+\bibitem{kruskal1978multidimensional}
+J.~B. Kruskal and M.~Wish, {\em Multidimensional scaling}, vol.~11.
+\newblock Sage, 1978.
+
+\bibitem{Hartigan1979algorithm}
+J.~A. Hartigan and M.~A. Wong, ``Algorithm as 136: A k-means clustering
+  algorithm,'' {\em Journal of the Royal Statistical Society. Series C (Applied
+  Statistics)}, vol.~28, no.~1, pp.~100--108, 1979.
+
+\bibitem{lee2008opinion}
+D.~Lee, O.-R. Jeong, and S.-g. Lee, ``Opinion mining of customer feedback data
+  on the web,'' in {\em Proceedings of the 2nd international conference on
+  Ubiquitous information management and communication}, pp.~230--235, ACM,
+  2008.
+
+\bibitem{gamon2005pulse}
+M.~Gamon, A.~Aue, S.~Corston-Oliver, and E.~Ringger, ``Pulse: Mining customer
+  opinions from free text,'' in {\em Advances in Intelligent Data Analysis VI},
+  pp.~121--132, Springer, 2005.
+
+\bibitem{ziegler2008mining}
+C.-N. Ziegler, M.~Skubacz, and M.~Viermetz, ``Mining and exploring unstructured
+  customer feedback data using language models and treemap visualizations,'' in
+  {\em Proceedings of the 2008 IEEE/WIC/ACM International Conference on Web
+  Intelligence and Intelligent Agent Technology-Volume 01}, pp.~932--937, IEEE
+  Computer Society, 2008.
+
+\bibitem{sparck1972statistical}
+K.~Sparck~Jones, ``A statistical interpretation of term specificity and its
+  application in retrieval,'' {\em Journal of documentation}, vol.~28, no.~1,
+  pp.~11--21, 1972.
+
+\bibitem{ganesan2010opinosis}
+K.~Ganesan, C.~Zhai, and J.~Han, ``Opinosis: a graph-based approach to
+  abstractive summarization of highly redundant opinions,'' in {\em Proceedings
+  of the 23rd international conference on computational linguistics},
+  pp.~340--348, Association for Computational Linguistics, 2010.
+
+\bibitem{riloff2005exploiting}
+E.~Riloff, J.~Wiebe, and W.~Phillips, ``Exploiting subjectivity classification
+  to improve information extraction,'' in {\em Proceedings of the National
+  Conference On Artificial Intelligence}, vol.~20, p.~1106, Menlo Park, CA;
+  Cambridge, MA; London; AAAI Press; MIT Press; 1999, 2005.
+
+\bibitem{pang2008opinion}
+B.~Pang and L.~Lee, ``Opinion mining and sentiment analysis,'' {\em Foundations
+  and trends in information retrieval}, vol.~2, no.~1-2, pp.~1--135, 2008.
+
+\bibitem{lee2010empirical}
+S.~Lee, J.~Baker, J.~Song, and J.~C. Wetherbe, ``An empirical comparison of
+  four text mining methods,'' in {\em System Sciences (HICSS), 2010 43rd Hawaii
+  International Conference on}, pp.~1--10, IEEE, 2010.
+
+\bibitem{blei2007correlated}
+D.~M. Blei and J.~D. Lafferty, ``A correlated topic model of science,'' {\em
+  The Annals of Applied Statistics}, pp.~17--35, 2007.
+
+\bibitem{hong2010empirical}
+L.~Hong and B.~D. Davison, ``Empirical study of topic modeling in twitter,'' in
+  {\em Proceedings of the first workshop on social media analytics},
+  pp.~80--88, ACM, 2010.
+
+\bibitem{mei2007topic}
+Q.~Mei, X.~Ling, M.~Wondra, H.~Su, and C.~Zhai, ``Topic sentiment mixture:
+  modeling facets and opinions in weblogs,'' in {\em Proceedings of the 16th
+  international conference on World Wide Web}, pp.~171--180, ACM, 2007.
+
+\bibitem{xia2011feature}
+W.~Xia, Y.~He, Y.~Tian, Q.~Chen, and L.~Lin, ``Feature expansion for
+  microblogging text based on latent dirichlet allocation with user feature,''
+  in {\em Information Technology and Artificial Intelligence Conference
+  (ITAIC), 2011 6th IEEE Joint International}, vol.~1, pp.~228--232, IEEE,
+  2011.
+
+\bibitem{chang2009latent}
+Y.-L. Chang and J.-T. Chien, ``Latent dirichlet learning for document
+  summarization,'' in {\em Acoustics, Speech and Signal Processing, 2009.
+  ICASSP 2009. IEEE International Conference on}, pp.~1689--1692, IEEE, 2009.
+
+\bibitem{mei2007automatic}
+Q.~Mei, X.~Shen, and C.~Zhai, ``Automatic labeling of multinomial topic
+  models,'' in {\em Proceedings of the 13th ACM SIGKDD international conference
+  on Knowledge discovery and data mining}, pp.~490--499, ACM, 2007.
+
+\bibitem{magatti2009automatic}
+D.~Magatti, S.~Calegari, D.~Ciucci, and F.~Stella, ``Automatic labeling of
+  topics,'' in {\em 2009 Ninth International Conference on Intelligent Systems
+  Design and Applications}, pp.~1227--1232, IEEE, 2009.
+
+\bibitem{lau2011automatic}
+J.~H. Lau, K.~Grieser, D.~Newman, and T.~Baldwin, ``Automatic labelling of
+  topic models,'' in {\em Proceedings of the 49th Annual Meeting of the
+  Association for Computational Linguistics: Human Language Technologies-Volume
+  1}, pp.~1536--1545, Association for Computational Linguistics, 2011.
+
+\bibitem{wang2010probabilistic}
+W.~Wang, P.~Barnaghi, and A.~Bargiela, ``Probabilistic topic models for
+  learning terminological ontologies,'' {\em Knowledge and Data Engineering,
+  IEEE Transactions on}, vol.~22, no.~7, pp.~1028--1040, 2010.
+
+\bibitem{ramage2009labeled}
+D.~Ramage, D.~Hall, R.~Nallapati, and C.~D. Manning, ``Labeled lda: A
+  supervised topic model for credit attribution in multi-labeled corpora,'' in
+  {\em Proceedings of the 2009 Conference on Empirical Methods in Natural
+  Language Processing: Volume 1-Volume 1}, pp.~248--256, Association for
+  Computational Linguistics, 2009.
+
+\bibitem{lehmann2015dbpedia}
+J.~Lehmann, R.~Isele, M.~Jakob, A.~Jentzsch, D.~Kontokostas, P.~N. Mendes,
+  S.~Hellmann, M.~Morsey, P.~van Kleef, S.~Auer, {\em et~al.}, ``Dbpedia--a
+  large-scale, multilingual knowledge base extracted from wikipedia,'' {\em
+  Semantic Web}, vol.~6, no.~2, pp.~167--195, 2015.
+
+\bibitem{bird2006nltk}
+S.~Bird, ``Nltk: the natural language toolkit,'' in {\em Proceedings of the
+  COLING/ACL on Interactive presentation sessions}, pp.~69--72, Association for
+  Computational Linguistics, 2006.
+
+\bibitem{mccallum2002mallet}
+A.~K. McCallum, ``Mallet: A machine learning for language toolkit.''
+  http://mallet.cs.umass.edu, 2002.
+
+\end{thebibliography}

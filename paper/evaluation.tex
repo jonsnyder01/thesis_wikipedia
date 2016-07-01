@@ -1,0 +1,80 @@
+\chapter{Evaluation Methods}  
+
+As mentioned in the introduction, evaluation can be a tricky part of labeling topic models.  What makes a good label, and how can it be measured?  A large part of this thesis was finding a good way to measure labeling performance automatically.  This is where the Wikipedia dataset is great.  It has a large set of categories that can be used as a surragate topic.
+
+\section{Matching Articles with Topics}
+The first problem is how to assign a set of articles to each topic.  After the topic modeling runs, the output is an assigned topic to each word.  One way is to choose the most representative topic for an article.  This has the problem of excluding many articles from topics.  A fix for this could be to choose the top N most representative topics for an article.  Consider an article where the topics are fairly represented among all the topics.  Ideally, in this case, this article would not be assigned to any of the topics.  On the other side of the spectrum is an article containing words primarily from only 2 topics.  Ideally, this article would only be assigned to those 2 topics even if N was greater than 2.
+
+One method to overcome these difficulties is to use a test for statistical significance.  Using the null hypothesis that the topics were chosen with equal probability, find the topics that are over-represented in the article.    This would require finding the number of words in the article at which a topic becomes significant, and then assign the article to the topics which have that many words in the article. This is done using a binomial probability test, which is to find the smallest $n$ such that
+\begin{equation}
+0.95 < \sum_{k=0}^{n} \binom Nk p^k (1-p)^{N-k}
+\end{equation}
+where $N$ is the number of words in the article, and $p$ is $1/($number of topics$)$.
+
+\section{Matching Articles with Categories}
+The next problem is how to assign a set of articles to a category.  This is computed by starting with a category and first finding all the articles directly beneath.  Then finding all the categories directly beneath, and finding the articles of those categories.  All the articles in the category are recursively discovered in this manner.  
+
+For example, figure \ref{figure:example-categories} shows a small selection of categories and articles.  There are 3 categories in this example, ``Information Retrieval''€™, ``Searching''€™, and ``Vector Space Model''€™.  There are 7 articles along the bottom of the figure, all in boxes.  The lines show the relationships among the categories and articles.
+
+\begin{figure}
+\linespread{1.0}
+\begin{forest}
+[Information\\Retrieval, align=center, base=top
+	[Information\\Retrieval, align=center, base=top, draw, tier=word]
+	[Precision\\and Recall, align=center, base=top, draw, tier=word]
+	[Searching
+		[Bayesian\\Search\\Theory, align=center, base=top, draw, tier=word]
+		[Nearest\\Neighbor\\Search, align=center, base=top, draw, tier=word]
+		[Term\\Indexing, align=center, base=top, draw, tier=word]
+	]
+	[Vector\\Space\\Model, align=center, base=top
+		[Vector\\Space\\Model, align=center, base=top, draw, tier=word]
+		[TF-IDF, draw, tier=word]
+	]
+]	
+\end{forest}
+\caption{Example Categories and Articles}
+\label{figure:example-categories}
+\end{figure}
+
+Table \ref{table:example-mappings} shows the resultant mappings between the categories and the articles.  The articles are listed on the left, and the categories across the top.  A one indicating that the article is mapped to the category, and a zero indicating it is not.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{lccc}
+	\hline
+	Article \textbackslash \ Category & Information Retrieval & Searching & Vector Space Model \\
+	\hline
+	Information Retrieval   & 1 & 0 & 0 \\
+	Precision and Recall    & 1 & 0 & 0 \\
+	Bayesian Search Theory  & 1 & 1 & 0 \\
+	Nearest Neighbor Search & 1 & 1 & 0 \\
+	Term Indexing           & 1 & 1 & 0 \\
+	Vector Space Model      & 1 & 0 & 1 \\
+	TF-IDF                  & 1 & 0 & 1 \\
+	\hline
+\end{tabular}
+\caption{Category Article Mappings from Figure \ref{figure:example-categories}}
+\label{table:example-mappings}
+\end{center}
+\end{table}
+
+\section{Matching Categories with Topics}
+The previous section describes mapping a set of articles to each topic.  Now the goal is to find a category that most closely matches a topic.  Another statistical test can be used to determine if a category even matches a topic better than chance.  First, the expected number of matching articles $E$ for the topic is calculated.
+\begin{equation}
+E = {N_t}\frac{N_c}{N_a}
+\end{equation}
+where $N_t$ is the number of articles in the Topic, $N_c$ is the number of articles in the category, and $N_a$ is the number of articles in the corpus.  One way to think about this is that $N_c/N_a$ is the probability that an article chosen at random is part of that category.  Then that probability is multiplied by $N_t$ to get $E$.
+
+Next, the observed number of articles $O$ that are in both the topic and the category is calculated.  Topic category pairs are considered when $O > E$ and the following Pearson Chi-Squared test is true:
+\begin{equation}
+\frac{(E - O)^2}{O} > 6.64
+\end{equation}
+
+Where 6.64 is the critical chi-squared statistic for a $99\%$ confidence interval with one degree of freedom.
+
+\section{Ranking Candidate Categories}
+Information retrieval methods can be used to rank the candidate categories.  A topic is considered as a set of matching articles against the category.  Precision, recall, and f-measures are then calculated from these categories.  The $\beta$ parameter of the f-measure can be used to bias toward more broad or more narrow category titles.
+
+\section{Evaluation of Labels}
+ROUGE-1 and ROUGE-2 metrics measured against the best matching category titles are used to evaluate the generated labels.

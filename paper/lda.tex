@@ -1,0 +1,260 @@
+\chapter{Latent Dirichlet Allocation}
+
+Latent Dirichlet allocation uses a generative mixture model to find latent topics in the data.  This chapter goes into detail of how this model works.
+
+\section{Generative Models}
+A generative model places probabilities on both the observed data, and the hidden parameters of the model.  Generative models can be contrasted with discriminate models.  Discriminate models instead seek to directly determine which class a particular observation belongs to.  Discriminate models include logistic regression models and support vector machine.  These models try to learn how to discriminate between classes.  On the other hand, generative models create a story for how the data was generated and then try to find the probabilities that lead to the highest chance of seeing the observed data.  In the example given in the last section, the story was that the documents were created using this story:
+\begin{enumerate}
+	\item Decide on an author $A_i$ that will write the document using $P(A_1)$ and $P(A_2)$
+	\item Generate 3 words in the document using the author's word probabilities, $P(V \mid A_i)$
+	\item Repeat for 4 documents
+\end{enumerate}
+
+\section{Mixture Models}
+In a mixture model, there are a set of observations with the assumption that these observations come from a set of probability distributions.  The task is to determine the most likely probability distributions and also the assignment of each observation as coming from one of the probability distributions.  
+
+As an example in the realm of natural language processing, suppose there is a set of 100 documents known to be from two different authors; however, the mapping between authors and documents is missing.  The task of the mixture model is to re-label the documents into the two authors.  First, we make the assumption that the labels can be determined simply by using a bag of words model (i.e. the word order and sentence structure does not matter.)    Next we randomly generate two probability distributions over all the words in the vocabulary.  That is we assign a probability that an author will use a particular word in the vocabulary.  
+
+\subsection{Assign Authors}
+Next we look at each document and compare the words used in that document against the probability distribution for each author.  At this stage we assign a weight between 0 and 1 of the likelihood that the author wrote that document.  Indeed this the intended output of the algorithm; however, the data most likely is not useful as the author models were generated randomly.
+
+\subsection{Adjust Author Model}
+The next stage is to adjust the author model.  Using the weight generated in the last step, a weighted average is created for each author.  This step is the solution to the following problem: given these documents and weights, what is most likely to be the author's probability distribution over words?  Assigning authors and the adjusting the author model is repeated until the probabilities converge.
+
+\subsection{Example}
+This section details a small toy-sized example of a mixture model containing 4 small sentences with two authors.   $D_i$ is a document.  Each document contains 3 words.
+\begin{equation}
+\begin{split}
+D_1 = [i,like,cats], D_2 = [cats,are,cool], \\
+D_3 = [i,like,dogs], D_4 = [dogs,are,cool]
+\end{split}
+\end{equation}
+The vocabulary consists of the 6 words used in the documents. 
+\begin{equation}
+V = [i,like,cats,are,cool,dogs]
+\end{equation}
+There are two authors, $A_1$, and $A_2$.  Each author has a probability distribution over the words in the vocabulary.  The probability distribution is initialized randomly.
+\begin{equation}
+\begin{split}
+P(\,V \mid A_1\,) = [0.16, 0.20, 0.07, 0.20, 0.18, 0.18] \\
+P(\,V \mid A_2\,) = [0.13, 0.21, 0.13, 0.26, 0.03, 0.24]
+\end{split}
+\end{equation}
+Additionally, the prior probability for each author is set to 0.5.  This corresponds to the assumption each author wrote half of the documents.
+\begin{equation}
+P(A_1) = P(A_2) = 0.5
+\end{equation}
+The probability that each document is produced by each author is determined:
+\begin{equation}
+P(\,D_i \mid A_j) = \prod_{k} P(\,D_{ik} \mid A_j\,)
+\label{eq:step1}
+\end{equation}
+Next, using Bayes' law, the probability of an author given a document is determined with:
+\begin{equation}
+P(\,A_j \mid D_i\,) = \frac{P(\,D_i \mid A_j\,)\ P(A_j)}{\sum_k P(\,D_i \mid A_k\,)\ P(A_k)}
+\label{eq:step2}
+\end{equation}
+Then, each author's probability distribution over words is updated.  This is basically a weighted average using $P(\,A_i\mid D\,)$ as weights.
+\begin{equation}
+P(\,V_i \mid A_j\,) = \frac{\sum_{k} P(\,A_j \mid D_k\,)\ P(\,V_i \mid D_k\,)}{\sum_{k} P(\,A_j \mid D_k\,)}
+\label{eq:step3}
+\end{equation}
+Finally, equations \ref{eq:step1}, \ref{eq:step2}, and \ref{eq:step3} are repeated until a suitably useful result is achieved.  Figures \ref{figure:author-given-document} and \ref{figure:word-given-author} show the progress of this algorithm over 3 iterations.  Looking at \ref{figure:author-given-document3}, $A_1$ appears to have written $D_2$ and $D_4$.  This matches with the writing style of the sentences.  Although ``I like cats.'', and ``Cats are cool.'' express similar ideas, ``Cats are cool.'', and ``Dogs are cool." posses a similar writing style.  Another interesting feature to the result is that the probability of ``dogs'' and ``cats'' occurring is independent from the author (i.e. both authors use those words with equal probability)
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\begin{bchart}[step=0.5,max=1.0,width=3cm]
+		\bcbar[plain]{0.38}
+		\bclabel{$D_1$}
+		\bcbar[plain,color=red!20]{0.62}
+		\smallskip
+		\bcbar[plain]{0.74}
+		\bclabel{$D_2$}
+		\bcbar[plain,color=red!20]{0.26}
+		\smallskip
+		\bcbar[plain]{0.47}
+		\bclabel{$D_3$}
+		\bcbar[plain,color=red!20]{0.53}
+		\smallskip
+		\bcbar[plain]{0.80}
+		\bclabel{$D_4$}
+		\bcbar[plain,color=red!20]{0.20}
+	\end{bchart}
+	\caption{Iteration 1}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\begin{bchart}[step=0.5,max=1.0,width=3cm]
+		\bcbar[plain]{0.17}
+		\bclabel{$D_1$}
+		\bcbar[plain,color=red!20]{0.83}
+		\smallskip
+		\bcbar[plain]{0.81}
+		\bclabel{$D_2$}
+		\bcbar[plain,color=red!20]{0.19}
+		\smallskip
+		\bcbar[plain]{0.23}
+		\bclabel{$D_3$}
+		\bcbar[plain,color=red!20]{0.77}
+		\smallskip
+		\bcbar[plain]{0.86}
+		\bclabel{$D_4$}
+		\bcbar[plain,color=red!20]{0.14}
+	\end{bchart}
+	\caption{Iteration 2}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+	\centering
+	\begin{bchart}[step=0.5,max=1.0,width=3cm]
+		\bcbar[plain]{0.05}
+		\bclabel{$D_1$}
+		\bcbar[plain,color=red!20]{0.95}
+		\smallskip
+		\bcbar[plain]{0.95}
+		\bclabel{$D_2$}
+		\bcbar[plain,color=red!20]{0.05}
+		\smallskip
+		\bcbar[plain]{0.06}
+		\bclabel{$D_3$}
+		\bcbar[plain,color=red!20]{0.94}
+		\smallskip
+		\bcbar[plain]{0.96}
+		\bclabel{$D_4$}
+		\bcbar[plain,color=red!20]{0.04}
+	\end{bchart}
+	\caption{Iteration 3}
+	\label{figure:author-given-document3}
+\end{subfigure}
+\caption{$P(\,A_j \mid D_i\,)$ across 3 iterations ($A_1$ is the top bar of each set)}
+\label{figure:author-given-document}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.3\textwidth}
+\begin{bchart}[steps={0.1,0.2,0.3},max=0.30,width=3cm]
+	\bcbar[plain]{0.16}
+	\bclabel{i}
+	\bcbar[plain,color=red!20]{0.13}
+	\smallskip
+	\bcbar[plain]{0.20}
+	\bclabel{like}
+	\bcbar[plain,color=red!20]{0.21}
+	\smallskip
+	\bcbar[plain]{0.07}
+	\bclabel{cats}
+	\bcbar[plain,color=red!20]{0.13}
+	\smallskip
+	\bcbar[plain]{0.20}
+	\bclabel{are}
+	\bcbar[plain,color=red!20]{0.26}
+	\smallskip
+	\bcbar[plain]{0.18}
+	\bclabel{cool}
+	\bcbar[plain,color=red!20]{0.03}
+	\smallskip
+	\bcbar[plain]{0.18}
+	\bclabel{dogs}
+	\bcbar[plain,color=red!20]{0.24}
+\end{bchart}
+\caption{Iteration 1}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+\begin{bchart}[steps={0.1,0.2,0.3},max=0.30,width=3cm]
+	\bcbar[plain]{0.12}
+	\bclabel{i}
+	\bcbar[plain,color=red!20]{0.24}
+	\smallskip
+	\bcbar[plain]{0.12}
+	\bclabel{like}
+	\bcbar[plain,color=red!20]{0.24}
+	\smallskip
+	\bcbar[plain]{0.16}
+	\bclabel{cats}
+	\bcbar[plain,color=red!20]{0.18}
+	\smallskip
+	\bcbar[plain]{0.21}
+	\bclabel{are}
+	\bcbar[plain,color=red!20]{0.10}
+	\smallskip
+	\bcbar[plain]{0.21}
+	\bclabel{cool}
+	\bcbar[plain,color=red!20]{0.10}
+	\smallskip
+	\bcbar[plain]{0.18}
+	\bclabel{dogs}
+	\bcbar[plain,color=red!20]{0.15}
+\end{bchart}
+\caption{Iteration 2}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+\begin{bchart}[steps={0.1,0.2,0.3},max=0.30,width=3cm]
+	\bcbar[plain]{0.06}
+	\bclabel{i}
+	\bcbar[plain,color=red!20]{0.28}
+	\smallskip
+	\bcbar[plain]{0.06}
+	\bclabel{like}
+	\bcbar[plain,color=red!20]{0.28}
+	\smallskip
+	\bcbar[plain]{0.16}
+	\bclabel{cats}
+	\bcbar[plain,color=red!20]{0.18}
+	\smallskip
+	\bcbar[plain]{0.27}
+	\bclabel{are}
+	\bcbar[plain,color=red!20]{0.06}
+	\smallskip
+	\bcbar[plain]{0.27}
+	\bclabel{cool}
+	\bcbar[plain,color=red!20]{0.06}
+	\smallskip
+	\bcbar[plain]{0.17}
+	\bclabel{dogs}
+	\bcbar[plain,color=red!20]{0.16}
+\end{bchart}
+\caption{Iteration 3}
+\end{subfigure}
+\caption{$P(\,V_i\mid A_j\,)$ for 3 iterations ($A_1$ is the top bar of each set)}
+\label{figure:word-given-author}
+\end{figure}
+
+
+
+\section{Dirichlet Process}
+To understand a Dirichlet process, first consider a Bernoulli process which is a sequence of independent random events that take the form of two discrete values.  It can be understood as the result of repeatedly flipping a coin and recording the results.  A Bernoulli distribution is the probability distribution of this process.  For example, if after flipping a coin 10 times and 7 are heads, the Bernoulli distribution can be used to determine the probability of this occurring.
+
+Just as a Bernoulli distribution can be understood as the result of coin flips, the Dirichlet distribution can be understood as a random process.  Consider an urn containing balls of $K$ different colors.  Initially the urn contains $\alpha_1$ balls of color 1, $\alpha_2$ balls of color 2 etc.  Now draw a ball from the urn at random.  Return the ball to the urn, but also add an additional ball of the same color.  If this process were repeated forever, the distribution of balls in the urn would approach a Dirichlet distribution with parameters $\alpha_1, \alpha_2, \dots, \alpha_K$.
+
+Figures \ref{figure:dirichlet1} and \ref{figure:dirichlet6} show examples of a dirichlet process carried out where $k = 3$.  Figure \ref{figure:dirichlet1} shows 3 examples with $\alpha = (1,1,1)$, and figure \ref{figure:dirichlet6} show 3 examples with $alpha = (6,6,6)$.  The box in the figures indicates the starting configuration of the urn, and the other circles represent the balls that were added to the urn. These examples help to give some intuitive understanding of the kinds of distributions that arise.  If the urn starts with just one ball of each color, one color will many times dominate the distribution.  Indeed the first example in figure \ref{figure:dirichlet1} shows a yellow ball was never chosen because blue is dominating the distribution.  Conversely, if the $\alpha$ values are increased, the distribution is more even as shown in figure \ref{figure:dirichlet6}.
+
+\begin{figure}
+\begin{centering}
+\input{polyas1}
+\caption{Dirichlet Process with $\alpha = (1,1,1)$}
+\label{figure:dirichlet1}
+\end{centering}
+\end{figure}
+
+\begin{figure}
+\begin{centering}
+\input{polyas6}
+\caption{Dirichlet Process with $\alpha = (6,6,6)$}
+\label{figure:dirichlet6}
+\end{centering}
+\end{figure}
+
+\section{Latent Dirichlet Allocation}
+Latent Dirichlet Allocation (LDA) combines these concepts to find the latent topics in the documents.  It accomplishes this with a probabilistic generative model using Dirichlet probability distributions.  The generative process involves these steps when creating a document:
+\begin{enumerate}
+\item{Decide on a distribution of topics for the document}
+\item{Select a topic from the distribution of topics for the document}
+\item{Select a word from the distribution of words in the topic}
+\item{Repeat this process until the document is complete}
+\end{enumerate}
+
+The algorithm iterates in much the same way as described in the example mixture model above, except now the topic models add a layer of complexity.  Additionally, all the probability distributions are modeled after a Dirichlet process.  Using a Dirichlet process leads to documents containing only a few high probability topics.  Similarly, the topic distributions are skewed to contain a small amount of high probability words.
+
+

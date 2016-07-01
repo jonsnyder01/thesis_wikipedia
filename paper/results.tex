@@ -1,0 +1,133 @@
+\chapter{Results}
+
+In general the methods used in the experiments do provide good labels.  Following are some examples of the best and worst labels from the results.  Although the automatic labeling methods discussed here do not provide perfect labels, 2 or 3 word phrases do provide useful information about the topic models.
+
+\begin{table}
+\begin{center}
+\begin{spacing}{2.0}
+\begin{tabularx}{5in}{@{}rX}
+\hline
+ROUGE-1 & \noindent 0.857 \\
+ROUGE-2 & \noindent 0.750 \\
+Topic & \noindent image, color, images, graphics, display, pixel, colors, screen, pixels, blue \\
+Categories & \noindent computer graphics algorithms, image processing, computer graphics \\
+Labels & \noindent computer graphics, image processing, digital image \\
+\hline
+ROUGE-1 & \noindent 0.000 \\
+ROUGE-2 & \noindent 0.000 \\
+Topic & \noindent robot, robots, robotics, robotic, control, human, motion, autonomous, mechanical, movement \\
+Categories & \noindent robotics, embedded systems, classes of computers \\
+Labels & \noindent mobile devices, autonomous robots, industrial robots \\
+\hline
+\end{tabularx}
+\caption{Labels from the 100 topic Computer Science dataset.}
+\end{spacing}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{spacing}{2.0}
+\begin{tabularx}{5in}{@{}rX}
+\hline
+ROUGE-1 & \noindent 0.833 \\
+ROUGE-2 & \noindent 0.667 \\
+Topic & \noindent culture, cultural, cultures, people, society, western, indigenous, identity, world, groups \\
+Categories & \noindent cultural studies, cultural education \\
+Labels & \noindent popular culture, cultural heritage, cultural studies \\
+\hline
+ROUGE-1 & \noindent 0.000 \\
+ROUGE-2 & \noindent 0.000 \\
+Topic & \noindent character, comics, fictional, comic, marvel, created, appeared, dc, man, universe \\
+Categories & \noindent fictional scientists, science and culture \\
+Labels & \noindent marvel comics, dc comics, comic books \\
+\hline
+\end{tabularx}
+\caption{Labels from the 100 topic Culture dataset.}
+\end{spacing}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{spacing}{2.0}
+\begin{tabularx}{5in}{@{}rX}
+\hline
+ROUGE-1 & \noindent 0.875 \\
+ROUGE-2 & \noindent 0.800 \\
+Topic & \noindent country, single, music, album, song, released, singles, american, chart, billboard \\
+Categories & \noindent country music, american country music, country music songs \\
+Labels & \noindent american country, american country music, country music \\
+\hline
+ROUGE-1 & \noindent 0.000 \\
+ROUGE-2 & \noindent 0.000 \\
+Topic & \noindent music, indian, film, singer, india, playback, films, tamil, songs, director \\
+Categories & \noindent filmi, indian film singers, indian film score composers \\
+Labels & \noindent popular music, classical music, world music \\
+\hline
+\end{tabularx}
+\caption{Labels from the 100 topic Popular Music dataset.}
+\end{spacing}
+\end{center}
+\end{table}
+
+\section{Best Case Analysis}
+As part of the experiment setup, the gold standard labels were searched for in the text.  This was to answer the question of how good could a labelers possibly be by using substrings from the document collection.  In most cases, the best case analysis showed that over 80\% of the gold standard labels were to be found in the document collection.  This was a surprising result because many of the papers [CITATION] made the assumption that good labels would need to be found outside of the original document collection.  
+
+On the other hand, there were some cases where it is understandable that the label isn't part of the text.  For example, one of the gold standard labels was ``video games by graphical style''.  It is not expected that this would be part of the text of any of the articles, but clearly indicates a category title.  Indeed this would not make a good label for a topic model because the phrase ``by graphical style'' has no meaning with an un-ordered collection of documents.  It may be worthwhile to remove from consideration categories which include prepositional phrases beginning with ``by''.
+
+Not all labels that were not found in the text were inferior.  Another example from the Computer Science dataset highlights a situation where a category label is good, but the substring is not found in the text.  The specific label , ``mathematics and computing colleges in england'', is a good label, but could only be generated from the text collection through abstractive summarization methods.
+
+\section{Dataset Selection}
+
+Overall, the labelers performed best on the Computer Science data set.  Next, the Popular Music dataset performed reasonably well, but the performance on the Culture dataset was sub-par.  The problem with the Culture dataset highlight the importance of choosing a good dataset.  The biggest issue with the dataset was its small size, particularly with the small number of categories that were chosen from for the gold standard.  This was a consequence of the broadness of the category.  Indeed, grabbing articles more than 2 levels deep gave too many articles for my experimental setup to handle.  Another issue with the Culture dataset was that many of the gold standard labels were one word; however, the simple cosine similarity metric biased toward 2 or 3 word phrases.
+
+Another problem with the Culture dataset highlights a problem with using the word-topic frequency to judge a label.  For the topic ``music,film,theatre,dance,performance,films,stage,audience,play,popular'', the gold standard identified the label ``entertainment'', however that word does not appear in the top ten for the topic.
+
+In some cases the labeler found a better label than what the gold standard claimed the best was.  For the topic model, ``information,media,online,social,software,web,management,digital,based,technology'', the best gold standard label was ``collaboration''.  Clearly the label that the labeler chose, ``social media information'', gives more semantic meaning, but the limitations of the depth of the Culture dataset keep there from being a  ``social media'' category to choose from.
+
+\section{Frequency versus TF-IDF}
+
+No significant difference was found between using the word-topic frequency vectors versus the TF-IDF vectors.  This may be the case because of the way that the topic models work.  Because the word distributions in the topic models follow a Dirichlet distribution, it is expected that the words only appear in a few of the other topic models.  The TF-IDF computation would then just apply a constant factor to all the candidate label scores having no affect on the outcome.  A better metric might be to change the IDF computation from including all words that are in the topic to just the top ten words in other topics.
+
+Using the zero order relevance factor as described in \cite{mei2007automatic}, was another way to change the frequency vector.  This change had such a detrimental effect to the generated labels that its use was discarded from future experiments.
+
+\section{Boost Levels}
+
+The ``linear'' boost method shows the most promise.  This method simply takes the product of the cosine similarity and the frequency that the label appears in the text.  The Culture dataset showed higher scores for the ``none'' boost method.  This method just used the raw cosine similarity metric to rank the labels.  I believe this anomaly can be explained by the poor results that the culture dataset showed in general.
+
+\section{First Order Labeler}
+
+As explained in \cite{mei2007automatic}, the first order labeler looks at the context of a label to get more information about its semantic meaning.  The experiments showed that this information was not helpful in ranking labels, and indeed it lowered the performance of the generated labels.  One example from the Computer Science dataset is helpful.  For the topic, ``protein, sequence, biology, dna, database, gene, bioinformatics, molecular, proteins, sequences'', the cosine similarity labeler using the word-topic frequency and linear boost found the best topic was ``computational biology''.  The first order labeler chose ``protein protein''.  This makes sense because the phrase protein protein interactions are used frequently in computational biology; however, it wouldn't be chosen by the cosine similarity metric because the length of the term vector ``protein protein'' is 2 and the length of the term vector ``computational biology'' is square root of 2.  Therefore, the cosine similarity metric will be larger for labels that do not repeat words.
+
+\section{Number of Topics}
+
+The ``Popular Music'' dataset highlights some problems with the number of topics.  In the 100 topic dataset, two topics were discovered that shared similar words.  In fact, the chosen gold standard categories, and the generated labels, were the same for all three topics.  
+
+Topic 1: country,music,texas,bluegrass,nashville,american,songs,folk,western,tennessee
+Topic 2: country,music,album,records,american,released,songs,debut,singer,nashville
+
+The chosen gold-standard categories were ``country music, american country music, and country music albums''.  The generated labels were ``american country, american country music, and country music''.  The TF-IDF computation was put in place to look at other topics while generating labels, but it was not effective at doing this.  An area of future work, is to add a method to make sure that a topic is discriminative.  A good label for topic 2 may be ``country music albums'', and topic 1 may be ``country music styles''.
+
+\section{F Scores}
+An F measure was used to generate the gold standard.  This measure compares the articles that are in the category to the articles that are in the topic.  A higher F measure favors narrow categories because it discounts false positives (articles in the topic but not the category).  Conversely, a lower F measure favors broad categories because it discounts false negatives (articles in the category but not the topic).  Three different F scores were tested, F-0.5, F-1, and F-2.  In all three datasets, the F-2 scores were better.  The F score were only used when generating the gold standard categories, so this indicates that the experimental labelers were better able to find narrow labels.
+
+\iffalse
+\begin{tabular}{lrrr}
+\hline
+Candidate Labels & Ranking Method & ROUGE-1 & ROUGE-2 \\
+\hline
+Entire Corpus & n/a & & \\
+Top 10 Words & n/a & & \\
+All N-Grams & TF - Cosine Similarity & & \\ 
+& TF-IDF Cosine Similarity & & \\
+Named Entity & KL Divergence & & \\
+Named Entity & TF - Cosine Similarity & & \\
+Named Entity & TF-IDF - Cosine Similarity & & \\
+\hline
+\end{tabular}
+\fi
+
+\chapter{Conclusion}
+
+There is much room for improvement, and having a gold standard dataset is a step toward that direction.  The methods outlined in this thesis show that a labeler can be automatically evaluated using Wikipedia categories as gold standard labels.  Once a good method is obtained, it could be applied outside of the domain of Wikipedia to label other topic models.

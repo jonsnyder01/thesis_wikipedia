@@ -1,0 +1,84 @@
+\documentclass[12pt, letterpaper, oneside, openright]{book}
+\usepackage[letterpaper, margin=1in, lmargin=1.5in]{geometry}
+\usepackage[document]{ragged2e}
+\setlength{\RaggedRightParindent}{\parindent}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{setspace}
+\usepackage{courier}
+\usepackage{amsmath, amssymb}
+\usepackage{forest}
+\usepackage[nottoc]{tocbibind}
+\usepackage{bchart}
+\usepackage{subcaption}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{tabularx}
+\newenvironment{abstract}%
+{\vfill\begin{center}%
+\bfseries \chapter{Abstract} \end{center}}%
+	{\vfill\null}
+\setstretch{2}
+\begin{document}
+\frontmatter
+\begin{titlepage}
+	\null\vspace{\stretch{1}}
+	\centering
+	{\huge Automatic Evaluation of Topic Model Labels using Wikipedia Categories\par}
+	by\par
+	Jonathan Snyder\par
+	B.S., University of Colorado at Colorado Springs, 2007\par
+	\null\vspace{\stretch{1}}
+	A thesis submitted to the Graduate Faculty of the \\
+	University of Colorado at Colorado Springs \\
+	in partial fulfillment of the \\
+	requirements for the degree of \\
+	Master of Science \\
+	Department of Computer Science \\
+	2016
+	\null\vspace{\stretch{1}}
+\end{titlepage}
+\begin{center}
+	\null\vspace{\stretch{1}}
+	This thesis for the Master of Science degree by\\
+	Jonathan Snyder\\
+	has been approved for the\\
+	Department of Computer Science\\
+	by\\
+	\null\vspace{\stretch{1}}
+	\noindent\begin{tabular}{cc}
+	\makebox[2in]{\hrulefill} & \makebox[1in]{\hrulefill}\\
+	Dr. Jugal Kalita, Chair & Date\\[8ex]
+	\makebox[2in]{\hrulefill} & \makebox[1in]{\hrulefill}\\
+	Dr. Rory Lewis & Date\\[8ex]
+	\makebox[2in]{\hrulefill} & \makebox[1in]{\hrulefill}\\
+	Dr. Terrance Boult & Date\\
+	\end{tabular}
+	\null\vspace{\stretch{1}}
+\end{center}
+\begin{abstract}
+Manual summarization is extremely labor intensive. Recent research has shown that topic models can provide a good overview of unstructured data.  Admittedly, the output of topic models can be hard to digest without good labels.  Previous approaches for automatic topic model have used many different methods for creating candidate labels.  For example, researchers have used Wikipedia article titles, keywords from article abstracts, or Del.icio.us tags as candidate labels.  In every case the labels were reviewed using human evaluators.  The contribution of this thesis is of an automatic method for evaluating topic labels.  Different labeling methods are evaluated using this automatic evaluation metric.  It is found that short noun phrases extracted from the original text give valuable context to topic models.
+\end{abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\mainmatter
+\input{introduction}
+\input{related_work}
+\input{lda}
+\input{methods}
+\input{evaluation}
+\input{results}
+
+\bibliographystyle{ieeetr}
+\refstepcounter{chapter}
+\bibliography{thesis}
+
+
+\appendix
+\input{dbpedia}
+\input{stopwords}
+
+\end{document}

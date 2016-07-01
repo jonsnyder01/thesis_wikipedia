@@ -1,0 +1,60 @@
+\contentsline {chapter}{Abstract}{ii}
+\contentsline {chapter}{List of Figures}{vii}
+\contentsline {chapter}{List of Tables}{viii}
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}Latent Dirichlet Allocation}{4}
+\contentsline {section}{\numberline {1.2}General Approach}{5}
+\contentsline {section}{\numberline {1.3}Contribution}{5}
+\contentsline {section}{\numberline {1.4}Overview}{5}
+\contentsline {chapter}{\numberline {2}Related Work}{7}
+\contentsline {section}{\numberline {2.1}Opinion Mining}{7}
+\contentsline {section}{\numberline {2.2}Topic Modeling}{8}
+\contentsline {section}{\numberline {2.3}Labeling Topic Models}{10}
+\contentsline {chapter}{\numberline {3}Latent Dirichlet Allocation}{11}
+\contentsline {section}{\numberline {3.1}Generative Models}{11}
+\contentsline {section}{\numberline {3.2}Mixture Models}{12}
+\contentsline {subsection}{\numberline {3.2.1}Assign Authors}{13}
+\contentsline {subsection}{\numberline {3.2.2}Adjust Author Model}{13}
+\contentsline {subsection}{\numberline {3.2.3}Example}{13}
+\contentsline {section}{\numberline {3.3}Dirichlet Process}{16}
+\contentsline {section}{\numberline {3.4}Latent Dirichlet Allocation}{18}
+\contentsline {chapter}{\numberline {4}Labeling Methods}{20}
+\contentsline {section}{\numberline {4.1}Documents Creation}{20}
+\contentsline {section}{\numberline {4.2}Text Preparation}{21}
+\contentsline {section}{\numberline {4.3}Latent Dirichlet Analysis}{22}
+\contentsline {section}{\numberline {4.4}Candidate Labels}{23}
+\contentsline {subsection}{\numberline {4.4.1}Chunked Noun Phrase}{23}
+\contentsline {subsection}{\numberline {4.4.2}N-Gram}{23}
+\contentsline {section}{\numberline {4.5}Ranking Candidate Labels}{23}
+\contentsline {subsection}{\numberline {4.5.1}KL Divergence of Co-occurring Words}{24}
+\contentsline {subsection}{\numberline {4.5.2}Term Frequency}{24}
+\contentsline {subsection}{\numberline {4.5.3}TF-IDF}{24}
+\contentsline {subsection}{\numberline {4.5.4}Cosine Similarity}{25}
+\contentsline {section}{\numberline {4.6}Cosine Similarity Performance Optimization}{25}
+\contentsline {section}{\numberline {4.7}First Order Preprocessing}{26}
+\contentsline {section}{\numberline {4.8}Discussion of Hyper-parameters}{26}
+\contentsline {section}{\numberline {4.9}Corpus Statistics}{27}
+\contentsline {chapter}{\numberline {5}Evaluation Methods}{29}
+\contentsline {section}{\numberline {5.1}Matching Articles with Topics}{29}
+\contentsline {section}{\numberline {5.2}Matching Articles with Categories}{30}
+\contentsline {section}{\numberline {5.3}Matching Categories with Topics}{31}
+\contentsline {section}{\numberline {5.4}Ranking Candidate Categories}{32}
+\contentsline {section}{\numberline {5.5}Evaluation of Labels}{33}
+\contentsline {chapter}{\numberline {6}Results}{34}
+\contentsline {section}{\numberline {6.1}Best Case Analysis}{34}
+\contentsline {section}{\numberline {6.2}Dataset Selection}{38}
+\contentsline {section}{\numberline {6.3}Frequency versus TF-IDF}{39}
+\contentsline {section}{\numberline {6.4}Boost Levels}{40}
+\contentsline {section}{\numberline {6.5}First Order Labeler}{40}
+\contentsline {section}{\numberline {6.6}Number of Topics}{41}
+\contentsline {section}{\numberline {6.7}F Scores}{42}
+\contentsline {chapter}{\numberline {7}Conclusion}{43}
+\contentsline {chapter}{Bibliography}{44}
+\contentsline {chapter}{\numberline {A}DBpedia Example Input}{49}
+\contentsline {section}{\numberline {A.1}Long Abstracts}{49}
+\contentsline {section}{\numberline {A.2}Article Titles}{51}
+\contentsline {section}{\numberline {A.3}Article Redirects}{51}
+\contentsline {section}{\numberline {A.4}Category Titles}{52}
+\contentsline {section}{\numberline {A.5}Article Categories}{52}
+\contentsline {section}{\numberline {A.6}Category Relationships}{53}
+\contentsline {chapter}{\numberline {B}Stopwords}{55}
